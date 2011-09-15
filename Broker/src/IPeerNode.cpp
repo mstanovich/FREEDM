@@ -64,10 +64,9 @@ namespace freedm {
 /// @param ios The related ioservice used for scheduling
 /// @param dispatch The dispatcher used to deliver messages
 /////////////////////////////////////////////////////////////
-IPeerNode::IPeerNode(std::string uuid, ConnManagerPtr connmgr,
+IPeerNode::IPeerNode(std::string uuid,
     boost::asio::io_service& ios, freedm::broker::CDispatcher& dispatch)
     : m_uuid(uuid),
-      m_connmgr(connmgr),
       m_ios(ios),
       m_dispatch(dispatch)
 {
@@ -101,7 +100,7 @@ void IPeerNode::SetStatus(int status)
 /////////////////////////////////////////////////////////////
 broker::ConnectionPtr IPeerNode::GetConnection()
 {
-    return m_connmgr.GetConnectionByUUID(m_uuid,m_ios,m_dispatch);
+    return broker::CConnectionManager::instance().GetConnectionByUUID(m_uuid,m_ios,m_dispatch);
 }
 
 /////////////////////////////////////////////////////////////

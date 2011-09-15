@@ -35,12 +35,14 @@
 #ifndef CONNECTIONMANAGER_HPP
 #define CONNECTIONMANAGER_HPP
 
-#include "CConnection.hpp"
-#include "CListener.hpp"
-#include "CReliableConnection.hpp"
 #include "IHandler.hpp"
+#include "CGlobalConfiguration.hpp"
+#include "CListener.hpp"
+#include "CConnection.hpp"
 
 #include "utility/uuid.hpp"
+
+#include "templates/Singleton.hpp"
 
 #include <set>
 #include <string>
@@ -55,19 +57,23 @@
 namespace freedm {
 namespace broker {
 
+class CReliableConnection;
+class CListener;
+class CConnection;
+
 /// Manages open connections so that they may be cleanly stopped
 class CConnectionManager
-    : private boost::noncopyable
+    : public templates::Singleton<CConnectionManager>
 {
 public:
     /// Typedef for the map which handles uuid to hostname
     typedef std::map<std::string, std::string> hostnamemap;
     
     /// Typedef for the map which handles uuid to connection 
-    typedef boost::bimap<std::string, ConnectionPtr> connectionmap;
+    typedef boost::bimap<std::string, CConnection::ConnectionPtr> connectionmap;
 
     /// Initialize the connection manager with the node uuid.
-    CConnectionManager(freedm::uuid uuid, std::string hostname);
+    CConnectionManager();
 
     /// Connection manager teardown.
     ~CConnectionManager() {  };
@@ -79,7 +85,7 @@ public:
     void PutHostname(std::string u_, std::string host_);
     
     /// Register a connection with the manager once it has been built.
-    void PutConnection(std::string uuid, ConnectionPtr c);
+    void PutConnection(std::string uuid, CConnection::ConnectionPtr c);
 
     /// Stop the specified connection.
     void Stop(CConnection::ConnectionPtr c);
@@ -100,7 +106,7 @@ public:
     std::string GetHostnameByUUID( std::string uuid ) const; 
 
     /// Fetch a connection pointer via UUID
-    ConnectionPtr GetConnectionByUUID( std::string uuid_,  boost::asio::io_service& ios,  CDispatcher &dispatch_ );
+    CConnection::ConnectionPtr GetConnectionByUUID( std::string uuid_,  boost::asio::io_service& ios,  CDispatcher &dispatch_ );
 
     /// An iterator to the beginning of the hostname map
     hostnamemap::iterator GetHostnamesBegin() { return m_hostnames.begin(); };

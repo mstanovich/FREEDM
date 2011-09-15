@@ -59,10 +59,10 @@ namespace freedm {
 /////////////////////////////////////////////////////////
 class GMPeerNode : public IPeerNode {
     public:
-      GMPeerNode(std::string uuid, ConnManagerPtr connmgr,
+      GMPeerNode(std::string uuid,
             boost::asio::io_service& ios,
             freedm::broker::CDispatcher& dispatch) :
-                IPeerNode(uuid,connmgr,ios,dispatch) {};
+                IPeerNode(uuid,ios,dispatch) {};
       enum { NORMAL,DOWN,RECOVERY,REORGANIZATION,ELECTION };
 };
 

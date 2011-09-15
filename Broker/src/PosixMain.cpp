@@ -42,6 +42,7 @@
 #include <boost/asio/ip/host_name.hpp> //for ip::host_name()
 #include <boost/thread.hpp>
 #include <boost/bind.hpp>
+#include <boost/lexical_cast.hpp>
 #include <set>
 #include <boost/program_options.hpp>
 #include <vector>
@@ -54,6 +55,7 @@ namespace po = boost::program_options;
 #include "CConnectionManager.hpp"
 #include "CPhysicalDeviceManager.hpp"
 #include "CGenericDevice.hpp"
+#include "CGlobalConfiguration.hpp"
 using namespace freedm;
 
 #include "utility/logger.hpp"
@@ -114,7 +116,7 @@ int main (int argc, char* argv[])
             ("address", po::value<std::string>(&listenIP_)->
                     default_value("0.0.0.0"), "IP interface to listen on")
             ("port,p", po::value<std::string>(&port_)->
-                    default_value("1870"), "TCP port to listen on")
+                    default_value("1870"), "Port port to listen on")
             ("verbose,v", po::value<int>(&verbose_)->
                     implicit_value(5)->default_value(3),
                     "enable verbose output (optionally specify level)");
@@ -217,10 +219,20 @@ int main (int argc, char* argv[])
             u_ = freedm::uuid::from_dns(hostname_);
             Logger::Info << "Generated UUID: " << u_ << std::endl;
         }
-
+        // Load the UUID into string
+        std::stringstream ss;
+        std::string uuidstr;
+        ss << u_;
+        ss >> uuidstr;
+        
+        /// Prepare the global Configuration
+        CGlobalConfiguration::instance().SetHostname(hostname_);
+        CGlobalConfiguration::instance().SetUUID(uuidstr);
+        CGlobalConfiguration::instance().SetListenPort(port_);
+        CGlobalConfiguration::instance().SetListenAddress(listenIP_);
         
         //constructors for initial mapping
-        freedm::broker::CConnectionManager m_conManager(u_,std::string(hostname_));
+        //freedm::broker::CConnectionManager m_conManager(u_,std::string(hostname_));
         freedm::broker::CPhysicalDeviceManager m_phyManager;
         freedm::broker::ConnectionPtr m_newConnection;
         boost::asio::io_service m_ios;
@@ -257,18 +269,12 @@ int main (int argc, char* argv[])
         //dispatch_.RegisterWriteHandler( "any", &uuidHandler_ );
 
         // Run server in background thread          
-        freedm::broker::CBroker broker_
-            (listenIP_, port_, dispatch_, m_ios, m_conManager);
+        freedm::broker::CBroker broker_(dispatch_, m_ios);
 
-        // Load the UUID into string
-        std::stringstream ss;
-        std::string uuidstr;
-        ss << u_;
-        ss >> uuidstr;
 
 
         // Instantiate and register the group management module
-        freedm::GMAgent GM_ (uuidstr, broker_.GetIOService(), dispatch_, m_conManager);     
+        freedm::GMAgent GM_ (uuidstr, broker_.GetIOService(), dispatch_);     
         dispatch_.RegisterReadHandler( "gm", &GM_);
 
         // Instantiate and register the power management module
@@ -301,7 +307,7 @@ int main (int argc, char* argv[])
                 // Add the UUID to the list of known hosts
                 //XXX This mechanism sould change to allow dynamically arriving 
                 //nodes with UUIDS not constructed using their DNS names   
-                m_conManager.PutHostname(uu_.str(), host_);
+                freedm::broker::CConnectionManager::instance().PutHostname(uu_.str(), host_);
             }                                                                                               
         } 
         else 
@@ -309,7 +315,7 @@ int main (int argc, char* argv[])
             Logger::Info << "Not adding any hosts on startup." << std::endl;
         }    
         // Add the local connection to the hostname list
-        m_conManager.PutHostname(uuidstr,"localhost");
+        freedm::broker::CConnectionManager::instance().PutHostname(uuidstr,"localhost");
         // Block all signals for background thread.
         sigset_t new_mask;
         sigfillset(&new_mask);

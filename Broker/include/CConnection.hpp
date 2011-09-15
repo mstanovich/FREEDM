@@ -64,8 +64,7 @@ public:
 
     /// Construct a CConnection with the given io_service.
     explicit CConnection(boost::asio::io_service& p_ioService,
-            CConnectionManager& p_manager, CDispatcher& p_dispatch,
-            std::string uuid);
+            CDispatcher& p_dispatch, std::string uuid);
 
     /// Start the first asynchronous operation for the CConnection.
     void Start();

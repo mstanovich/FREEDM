@@ -62,9 +62,7 @@ class CBroker : private boost::noncopyable
 public:
     /// Initialize the broker and begin accepting connections and messages from
     /// other nodes and modules.
-    explicit CBroker(const std::string& address, const std::string& port,
-                   CDispatcher& p_dispatch, boost::asio::io_service &m_ios,
-                   freedm::broker::CConnectionManager &m_conMan);
+    explicit CBroker(CDispatcher& p_dispatch, boost::asio::io_service &m_ios);
 
     /// Run the Server's io_service loop.
     void Run();
@@ -84,9 +82,6 @@ public:
 
     /// The io_service used to perform asynchronous operations.
     boost::asio::io_service &m_ioService;
-
-    /// The connection manager which owns all live connections.
-    CConnectionManager &m_connManager;
 
     /// The handler for all incoming requests.
     CDispatcher &m_dispatch;

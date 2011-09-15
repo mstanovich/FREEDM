@@ -54,7 +54,6 @@
 
 namespace freedm {
 typedef boost::shared_ptr<freedm::broker::CMessage> MessagePtr;
-typedef freedm::broker::CConnectionManager& ConnManagerPtr;
 //////////////////////////////////////////////////////////
 /// class IPeerNode
 ///
@@ -71,8 +70,7 @@ class IPeerNode
   , private boost::noncopyable
 {
     public:
-        IPeerNode(std::string uuid, ConnManagerPtr connmgr,
-            boost::asio::io_service& ios, freedm::broker::CDispatcher& dispatch);
+        IPeerNode(std::string uuid, boost::asio::io_service& ios, freedm::broker::CDispatcher& dispatch);
         /////////////////////////////////////////////////////////////
         /// @fn IPeerNode::GetStatus
         /// @description returns the status stored in the node as an
@@ -94,16 +92,10 @@ class IPeerNode
         /// @description Returns the hostname of this peer node as a
         ///              string
         /////////////////////////////////////////////////////////////
-        std::string GetHostname() const { return m_connmgr.GetHostnameByUUID(GetUUID()); };
+        std::string GetHostname() const { return broker::CConnectionManager::instance().GetHostnameByUUID(GetUUID()); };
 
         /// Gives a connection ptr to this peer
         broker::ConnectionPtr GetConnection();
-        /////////////////////////////////////////////////////////////
-        /// @fn IPeerNode::GetConnectionManager
-        /// @description Returns a reference to the connection manager
-        ///              this object was constructed with.
-        /////////////////////////////////////////////////////////////
-        ConnManagerPtr GetConnectionManager() { return m_connmgr; };
         /////////////////////////////////////////////////////////////
         /// @fn IPeerNode::GetIOService
         /// @description Returns a reference to the IO_Service this
@@ -124,7 +116,6 @@ class IPeerNode
         friend class CAgent;
     private:
         std::string m_uuid; /// This node's uuid.
-        ConnManagerPtr m_connmgr; /// The connection manager to use
         boost::asio::io_service& m_ios; /// io_service to connect with
         freedm::broker::CDispatcher& m_dispatch; /// Message handling dispatcher.
         int m_status;

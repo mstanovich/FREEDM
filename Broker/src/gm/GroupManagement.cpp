@@ -178,9 +178,8 @@ unsigned int GMAgent::MurmurHash2 ( const void * p_key, int p_len)
 /// @param p_conManager: The connection manager to use in this class.
 ///////////////////////////////////////////////////////////////////////////////
 GMAgent::GMAgent(std::string p_uuid, boost::asio::io_service &p_ios,
-               freedm::broker::CDispatcher &p_dispatch,
-               freedm::broker::CConnectionManager &p_conManager):
-  GMPeerNode(p_uuid,p_conManager,p_ios,p_dispatch),
+               freedm::broker::CDispatcher &p_dispatch):
+  GMPeerNode(p_uuid,p_ios,p_dispatch),
   m_timer(p_ios)
 {
   Logger::Debug << __PRETTY_FUNCTION__ << std::endl;
@@ -1067,7 +1066,7 @@ GMAgent::PeerNodePtr GMAgent::AddPeer(std::string uuid)
 {
   Logger::Debug << __PRETTY_FUNCTION__ << std::endl;
   PeerNodePtr tmp_;
-  tmp_.reset(new GMPeerNode(uuid,GetConnectionManager(),GetIOService(),GetDispatcher()));
+  tmp_.reset(new GMPeerNode(uuid,GetIOService(),GetDispatcher()));
   InsertInPeerSet(m_AllPeers,tmp_);
   return tmp_;
 }
@@ -1109,7 +1108,9 @@ int GMAgent::Run()
 
   std::map<std::string, std::string>::iterator mapIt_;
 
-  for( mapIt_ = GetConnectionManager().GetHostnamesBegin(); mapIt_ != GetConnectionManager().GetHostnamesEnd(); ++mapIt_ )
+  for( mapIt_ = broker::CConnectionManager::instance().GetHostnamesBegin();
+       mapIt_ != broker::CConnectionManager::instance().GetHostnamesEnd();
+       ++mapIt_ )
   {
       std::string host_ = mapIt_->first;
       AddPeer(const_cast<std::string&>(mapIt_->first));

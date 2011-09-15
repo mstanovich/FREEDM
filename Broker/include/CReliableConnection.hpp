@@ -59,9 +59,8 @@ public:
     typedef boost::shared_ptr<CReliableConnection> ConnectionPtr;
 
     /// Construct a CConnection with the given io_service.
-    explicit CReliableConnection(boost::asio::io_service& p_ioService,
-            CConnectionManager& p_manager, CDispatcher& p_dispatch,
-            std::string uuid);
+    explicit CReliableConnection(boost::asio::io_service& p_ioService, 
+      CDispatcher& p_dispatch, std::string uuid);
 
     /// Get the socket associated with the CConnection.
     boost::asio::ip::udp::socket& GetSocket();
@@ -73,25 +72,25 @@ public:
     virtual void Stop() = 0;
 
     /// Get associated UUID
-    std::string GetUUID() { return m_uuid; };
-
-    /// Get Connection Manager
-    CConnectionManager& GetConnectionManager() { return m_connManager; };
+    std::string GetUUID();
 
     /// Get the dispatcher
-    CDispatcher& GetDispatcher() { return m_dispatch; };
+    CDispatcher& GetDispatcher();
+
+    /// Get the connection Manager
+    CConnectionManager& GetConnectionManager();
 
     /// Get the out window size
-    unsigned int GetWindowSize() { return WINDOWSIZE; };
+    unsigned int GetWindowSize();
     
     /// Get the sequencing Modulo
-    unsigned int GetSequenceModulo() { return SEQUENCEMODULO; }
+    unsigned int GetSequenceModulo();
 
     /// Set the connection reliability for DCUSTOMNETWORK
-    void SetReliability(int r) { m_reliability = r; };
+    void SetReliability(int r);
     
     /// Get the connection reliability for DCUSTOMNETWORK
-    int GetReliability() { return m_reliability; };
+    int GetReliability();
 
 private:
 
@@ -103,9 +102,6 @@ private:
 
     /// Socket for the CConnection.
     boost::asio::ip::udp::socket m_socket;
-
-    /// The manager for this CConnection.
-    CConnectionManager& m_connManager;
 
     /// The dispatcher used to process the incoming request.
     CDispatcher& m_dispatch;

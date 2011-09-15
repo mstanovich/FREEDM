@@ -63,8 +63,8 @@ namespace freedm {
 /// @param uuid: The uuid this node connects to, or what listener.
 ///////////////////////////////////////////////////////////////////////////////
 CListener::CListener(boost::asio::io_service& p_ioService,
-  CConnectionManager& p_manager, CDispatcher& p_dispatch, std::string uuid)
-  : CReliableConnection(p_ioService,p_manager,p_dispatch,uuid)
+  CDispatcher& p_dispatch, std::string uuid)
+  : CReliableConnection(p_ioService,p_dispatch,uuid)
 {
     Logger::Debug << __PRETTY_FUNCTION__ << std::endl;
 }
@@ -170,7 +170,8 @@ void CListener::HandleRead(const boost::system::error_code& e, std::size_t bytes
             {
                 Logger::Info << "Got ACK #" << sequenceno << std::endl;
                 GetConnectionManager().PutHostname(uuid,hostname);
-                GetConnectionManager().GetConnectionByUUID(uuid, GetSocket().get_io_service(), GetDispatcher())->RecieveACK(sequenceno);
+                GetConnectionManager().GetConnectionByUUID(uuid, GetSocket().get_io_service(), 
+                    GetDispatcher())->RecieveACK(sequenceno);
             }
             else if(m_message.GetStatus() == freedm::broker::CMessage::Created)
             {

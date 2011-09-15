@@ -70,24 +70,24 @@ namespace freedm {
 /// @param m_conMan The connection manager used by this broker.
 /// @limiations Fails if the port is already in use.
 ///////////////////////////////////////////////////////////////////////////////
-CBroker::CBroker(const std::string& p_address, const std::string& p_port,
-    CDispatcher &p_dispatch, boost::asio::io_service &m_ios,
-    freedm::broker::CConnectionManager &m_conMan)
+CBroker::CBroker(CDispatcher &p_dispatch, boost::asio::io_service &m_ios)
     : m_ioService(m_ios),
-      m_connManager(m_conMan),
       m_dispatch(p_dispatch),
-      m_newConnection(new CListener(m_ioService, m_connManager, m_dispatch, m_conMan.GetUUID()))
+      m_newConnection(new CListener(m_ioService, m_dispatch,
+                        CGlobalConfiguration::instance().GetUUID()))
 {
     Logger::Debug << __PRETTY_FUNCTION__ << std::endl;
     // Open the acceptor with the option to reuse the address (i.e. SO_REUSEADDR).
+    std::string addr = CGlobalConfiguration::instance().GetListenAddress();
+    std::string port = CGlobalConfiguration::instance().GetListenPort();
     boost::asio::ip::udp::resolver resolver(m_ioService);
-    boost::asio::ip::udp::resolver::query query( p_address, p_port);
+    boost::asio::ip::udp::resolver::query query(addr, port);
     boost::asio::ip::udp::endpoint endpoint = *resolver.resolve( query );
     
     // Listen for connections and create an event to spawn a new connection
     m_newConnection->GetSocket().open(endpoint.protocol());
     m_newConnection->GetSocket().bind(endpoint);;
-    m_connManager.Start(m_newConnection);
+    CConnectionManager::instance().Start(m_newConnection);
 }
 ///////////////////////////////////////////////////////////////////////////////
 /// @fn CBroker::Run()
@@ -150,7 +150,7 @@ void CBroker::HandleStop()
     // The server is stopped by canceling all outstanding asynchronous
     // operations. Once all operations have finished the io_service::run() call
     // will exit.
-    m_connManager.StopAll();
+    CConnectionManager::instance().StopAll();
     m_ioService.stop(); 
 }
 

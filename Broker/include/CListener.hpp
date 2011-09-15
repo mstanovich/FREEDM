@@ -62,8 +62,7 @@ public:
     typedef boost::shared_ptr<CListener> ConnectionPtr;
     /// Construct a CConnection with the given io_service.
     explicit CListener(boost::asio::io_service& p_ioService,
-            CConnectionManager& p_manager, CDispatcher& p_dispatch,
-            std::string uuid);
+            CDispatcher& p_dispatch, std::string uuid);
 
     /// Start the first asynchronous operation for the CConnection.
     void Start();

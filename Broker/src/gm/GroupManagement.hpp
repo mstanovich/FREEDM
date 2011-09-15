@@ -85,7 +85,7 @@ class GMAgent
   friend class templates::Singleton< GMAgent >;
   public:
     GMAgent();
-    GMAgent(std::string uuid_, boost::asio::io_service &ios, freedm::broker::CDispatcher &p_dispatch, freedm::broker::CConnectionManager &m_conManager);
+    GMAgent(std::string uuid_, boost::asio::io_service &ios, freedm::broker::CDispatcher &p_dispatch);
     GMAgent(const GMAgent&);
     GMAgent& operator=(const GMAgent&);
     ~GMAgent();

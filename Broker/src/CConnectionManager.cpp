@@ -54,11 +54,10 @@ namespace broker {
 /// @param uuid: The uuid of this node
 /// @param hostname: the hostname of this node
 ///////////////////////////////////////////////////////////////////////////////
-CConnectionManager::CConnectionManager(freedm::uuid uuid, std::string hostname)
+CConnectionManager::CConnectionManager()
 {
-    std::stringstream ss;
-    ss << uuid; m_uuid = ss.str();
-    m_hostname = hostname;
+    m_uuid = CGlobalConfiguration::instance().GetUUID();
+    m_hostname = CGlobalConfiguration::instance().GetHostname();
 };
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -234,7 +233,7 @@ ConnectionPtr CConnectionManager::GetConnectionByUUID
     s_ = mapIt_->second;
 
     // Create a new CConnection object for this host	
-    c_.reset(new CConnection(ios, *this, dispatch_, uuid_));  
+    c_.reset(new CConnection(ios, dispatch_, uuid_));  
    
     // Initiate the TCP connection
     //XXX Right now, the port is hardcoded  
