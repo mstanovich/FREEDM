@@ -29,40 +29,8 @@ class set_value {
     }
 };
 
-
-
-// Warning: If T's constructor throws, instance() will return a null reference.
-template<class T>
-class Singleton : private boost::noncopyable
-{
-
-public:
-    static T& instance()
-    {
-        boost::call_once(init, flag);
-        return *t;
-    }
-
-    static void init() // never throws
-    {
-        t.reset(new T());
-    }
-
-protected:
-    ~Singleton() {}
-     Singleton() {}
-
-private:
-     static boost::scoped_ptr<T> t;
-     static boost::once_flag flag;
-
-};
-
 }
 
-template<class T> boost::scoped_ptr<T> Templates::Singleton<T>::t(0);
-template<class T> boost::once_flag Templates::Singleton<T>::flag
-									= BOOST_ONCE_INIT;
 
 template <class T>
 bool from_string(T& t,
@@ -80,6 +48,5 @@ std::stringstream oss;
 oss << value;
 return oss.str();
 }
-
 
 #endif /* UTILITY_HPP_ */

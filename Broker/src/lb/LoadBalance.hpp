@@ -45,13 +45,15 @@ using boost::property_tree::ptree;
 #include <boost/shared_ptr.hpp>
 #include <boost/progress.hpp>
 
+#include "templates/Singleton.hpp"
+
 #include "CMessage.hpp"
-#include "utility/Utility.hpp"
 #include "LBPeerNode.hpp"
 //#include "ExtensibleLineProtocol.hpp"
 #include "CLineClient.hpp"
 #include "IHandler.hpp"
 #include "utility/uuid.hpp"
+#include "utility/Utility.hpp"
 #include "CDispatcher.hpp"
 #include "CConnectionManager.hpp"
 #include "CConnection.hpp"
@@ -79,9 +81,9 @@ enum {
 ///
 /////////////////////////////////////////////////////////
 
-class lbAgent : public IReadHandler, public LPeerNode, public Templates::Singleton< lbAgent > {
+class lbAgent : public IReadHandler, public LPeerNode, public templates::Singleton< lbAgent > {
 
-    friend class Templates::Singleton< lbAgent >;
+    friend class templates::Singleton< lbAgent >;
   
 public:
 	lbAgent(std::string &uuid_, boost::asio::io_service &ios, freedm::broker::CDispatcher 								      

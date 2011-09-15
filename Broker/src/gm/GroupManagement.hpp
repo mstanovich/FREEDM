@@ -54,7 +54,7 @@ using boost::property_tree::ptree;
 #include "CDispatcher.hpp"
 #include "CConnectionManager.hpp"
 #include "CConnection.hpp"
-#include "utility/Utility.hpp"
+#include "templates/Singleton.hpp"
 #include "utility/uuid.hpp"
 
 using boost::asio::ip::tcp;
@@ -79,10 +79,10 @@ enum {
 
 class GMAgent
   : public IReadHandler, public GMPeerNode,
-    public Templates::Singleton< GMAgent >, 
+    public templates::Singleton< GMAgent >, 
     public IAgent< boost::shared_ptr<GMPeerNode> >
 {
-  friend class Templates::Singleton< GMAgent >;
+  friend class templates::Singleton< GMAgent >;
   public:
     GMAgent();
     GMAgent(std::string uuid_, boost::asio::io_service &ios, freedm::broker::CDispatcher &p_dispatch, freedm::broker::CConnectionManager &m_conManager);

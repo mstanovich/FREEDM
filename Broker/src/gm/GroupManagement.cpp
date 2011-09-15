@@ -40,7 +40,6 @@
 #include "GroupManagement.hpp"
 #include "GMPeerNode.hpp"
 
-#include "utility/Utility.hpp"
 #include "CMessage.hpp"
 
 #include <algorithm>

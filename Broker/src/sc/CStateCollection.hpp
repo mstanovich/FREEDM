@@ -47,11 +47,11 @@ using boost::property_tree::ptree;
 #include <boost/progress.hpp>
 
 #include "CMessage.hpp"
-#include "Utility.hpp"
+#include "templates/Singleton.hpp"
 #include "SCPeerNode.hpp"
 //#include "ExtensibleLineProtocol.hpp"
 #include "IHandler.hpp"
-#include "uuid.hpp"
+#include "utility/uuid.hpp"
 #include "CDispatcher.hpp"
 #include "CConnectionManager.hpp"
 #include "CConnection.hpp"
@@ -81,8 +81,8 @@ enum {
 ///     
 ///////////////////////////////////////////////////////////////////////////////
 
-class SCAgent : public IReadHandler, public SCPeerNode, public Templates::Singleton< SCAgent > {
-  friend class Templates::Singleton< SCAgent >;
+class SCAgent : public IReadHandler, public SCPeerNode, public templates::Singleton< SCAgent > {
+  friend class templates::Singleton< SCAgent >;
   public:
     
     typedef std::pair< std::string, int >  StateVersion;
