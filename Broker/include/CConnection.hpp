@@ -37,8 +37,7 @@
 #include "CDispatcher.hpp"
 #include "CReliableConnection.hpp"
 
-#include "concurrentqueue.hpp"
-#include "SlidingWindow.hpp"
+#include "types/SlidingWindow.hpp"
 
 #include <boost/asio.hpp>
 #include <boost/array.hpp>

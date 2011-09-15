@@ -40,12 +40,12 @@
 #include <boost/shared_ptr.hpp>
 #include <boost/thread/mutex.hpp>
 
-#include "uuid.hpp"
+#include "utility/uuid.hpp"
 #include "CBroker.hpp"
 #include "CConnection.hpp"
 
 
-#include "logger.hpp"
+#include "utility/logger.hpp"
 //CREATE_EXTERN_STD_LOGS();
 
 

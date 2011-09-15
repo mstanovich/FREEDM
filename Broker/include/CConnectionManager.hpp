@@ -38,6 +38,9 @@
 #include "CConnection.hpp"
 #include "CListener.hpp"
 #include "CReliableConnection.hpp"
+#include "IHandler.hpp"
+
+#include "utility/uuid.hpp"
 
 #include <set>
 #include <string>
@@ -48,8 +51,6 @@
 #include <boost/noncopyable.hpp>
 #include <boost/shared_ptr.hpp>
 #include <boost/enable_shared_from_this.hpp>
-#include "uuid.hpp"
-#include "IHandler.hpp"
 
 namespace freedm {
 namespace broker {

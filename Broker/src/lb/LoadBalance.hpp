@@ -46,12 +46,12 @@ using boost::property_tree::ptree;
 #include <boost/progress.hpp>
 
 #include "CMessage.hpp"
-#include "Utility.hpp"
+#include "utility/Utility.hpp"
 #include "LBPeerNode.hpp"
 //#include "ExtensibleLineProtocol.hpp"
 #include "CLineClient.hpp"
 #include "IHandler.hpp"
-#include "uuid.hpp"
+#include "utility/uuid.hpp"
 #include "CDispatcher.hpp"
 #include "CConnectionManager.hpp"
 #include "CConnection.hpp"

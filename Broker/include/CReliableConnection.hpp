@@ -36,9 +36,6 @@
 #include "CMessage.hpp"
 #include "CDispatcher.hpp"
 
-#include "concurrentqueue.hpp"
-#include "SlidingWindow.hpp"
-
 #include <boost/asio.hpp>
 #include <boost/array.hpp>
 #include <boost/noncopyable.hpp>

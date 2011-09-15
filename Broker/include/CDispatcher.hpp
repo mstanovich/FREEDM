@@ -45,14 +45,14 @@
 #ifndef CDISPATCHER_HPP
 #define CDISPATCHER_HPP
 
-#include "IHandler.hpp"
-
 #include <map>
 #include <string>
 #include <boost/noncopyable.hpp>
 #include <boost/thread/mutex.hpp>
-
 #include <boost/property_tree/ptree.hpp>
+
+#include "IHandler.hpp"
+
 using boost::property_tree::ptree;
 
 namespace freedm {

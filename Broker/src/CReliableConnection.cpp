@@ -37,8 +37,7 @@
 #include "CReliableConnection.hpp"
 #include "CConnectionManager.hpp"
 #include "CMessage.hpp"
-#include "RequestParser.hpp"
-#include "logger.hpp"
+#include "utility/logger.hpp"
 
 
 #include <vector>

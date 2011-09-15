@@ -36,7 +36,7 @@
 #include <boost/thread/locks.hpp>
 
 #include "CDispatcher.hpp"
-#include "logger.hpp"
+#include "utility/logger.hpp"
 CREATE_EXTERN_STD_LOGS()
 
 #define UNUSED_ARGUMENT(x) (void)x

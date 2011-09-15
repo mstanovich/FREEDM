@@ -41,7 +41,7 @@
 #include <map>
 
 // Logging facility
-#include "logger.hpp"
+#include "utility/logger.hpp"
 
 // Serialization and smart ptrs
 #include <boost/bind.hpp>

@@ -37,7 +37,7 @@
 #include "CBroker.hpp"
 #include <boost/thread/locks.hpp>
 
-#include "logger.hpp"
+#include "utility/logger.hpp"
 CREATE_EXTERN_STD_LOGS()
 
 #include <algorithm>

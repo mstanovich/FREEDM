@@ -56,8 +56,8 @@ namespace po = boost::program_options;
 #include "CGenericDevice.hpp"
 using namespace freedm;
 
-#include "logger.hpp"
-#include "uuid.hpp"
+#include "utility/logger.hpp"
+#include "utility/uuid.hpp"
 #include "version.h"
 
 #if !defined(_WIN32)

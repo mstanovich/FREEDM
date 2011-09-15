@@ -48,14 +48,14 @@ using boost::property_tree::ptree;
 #include <boost/interprocess/sync/interprocess_mutex.hpp>
 
 #include "CMessage.hpp"
-#include "Utility.hpp"
 #include "GMPeerNode.hpp"
 #include "IAgent.hpp"
 #include "IHandler.hpp"
-#include "uuid.hpp"
 #include "CDispatcher.hpp"
 #include "CConnectionManager.hpp"
 #include "CConnection.hpp"
+#include "utility/Utility.hpp"
+#include "utility/uuid.hpp"
 
 using boost::asio::ip::tcp;
 

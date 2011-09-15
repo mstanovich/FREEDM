@@ -43,7 +43,7 @@
 
 #include "LoadBalance.hpp"
 
-#include "Utility.hpp"
+#include "utility/Utility.hpp"
 #include "CMessage.hpp"
 
 #include <algorithm>
@@ -80,7 +80,7 @@
 #include <boost/property_tree/ptree.hpp>
 using boost::property_tree::ptree;
 
-#include "logger.hpp"
+#include "utility/logger.hpp"
 
 CREATE_EXTERN_STD_LOGS()
 

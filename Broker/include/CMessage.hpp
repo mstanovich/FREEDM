@@ -41,7 +41,7 @@ using boost::property_tree::ptree;
 #include <string>
 #include <set>
 
-#include "logger.hpp"
+#include "utility/logger.hpp"
 CREATE_EXTERN_STD_LOGS()
 
 namespace freedm {

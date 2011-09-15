@@ -33,7 +33,7 @@
 #include "CPhysicalDeviceManager.hpp"
 #include "IPhysicalDevice.hpp"
 
-#include "logger.hpp"
+#include "utility/logger.hpp"
 CREATE_EXTERN_STD_LOGS()
 
 #include <boost/bind.hpp>
