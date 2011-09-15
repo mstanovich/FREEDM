@@ -63,8 +63,7 @@ public:
     typedef boost::shared_ptr<CConnection> ConnectionPtr;
 
     /// Construct a CConnection with the given io_service.
-    explicit CConnection(boost::asio::io_service& p_ioService,
-            CDispatcher& p_dispatch, std::string uuid);
+    explicit CConnection(boost::asio::io_service& p_ioService, std::string uuid);
 
     /// Start the first asynchronous operation for the CConnection.
     void Start();

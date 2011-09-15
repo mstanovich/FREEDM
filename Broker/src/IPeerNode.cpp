@@ -65,10 +65,9 @@ namespace freedm {
 /// @param dispatch The dispatcher used to deliver messages
 /////////////////////////////////////////////////////////////
 IPeerNode::IPeerNode(std::string uuid,
-    boost::asio::io_service& ios, freedm::broker::CDispatcher& dispatch)
+    boost::asio::io_service& ios)
     : m_uuid(uuid),
-      m_ios(ios),
-      m_dispatch(dispatch)
+      m_ios(ios)
 {
     Logger::Debug << __PRETTY_FUNCTION__ << std::endl;
 }
@@ -100,7 +99,7 @@ void IPeerNode::SetStatus(int status)
 /////////////////////////////////////////////////////////////
 broker::ConnectionPtr IPeerNode::GetConnection()
 {
-    return broker::CConnectionManager::instance().GetConnectionByUUID(m_uuid,m_ios,m_dispatch);
+    return broker::CConnectionManager::instance().GetConnectionByUUID(m_uuid,m_ios);
 }
 
 /////////////////////////////////////////////////////////////

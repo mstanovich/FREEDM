@@ -51,6 +51,7 @@
 #include <boost/thread/mutex.hpp>
 #include <boost/property_tree/ptree.hpp>
 
+#include "templates/Singleton.hpp"
 #include "IHandler.hpp"
 
 using boost::property_tree::ptree;
@@ -62,7 +63,7 @@ class CMessage;
 
 /// Handles applying read and write handlers to incoming messages
 class CDispatcher
-  : private boost::noncopyable
+  : public templates::Singleton<CDispatcher>
 {
 public:
     /// Constructor for the dispatcher

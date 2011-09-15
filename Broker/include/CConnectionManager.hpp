@@ -106,7 +106,7 @@ public:
     std::string GetHostnameByUUID( std::string uuid ) const; 
 
     /// Fetch a connection pointer via UUID
-    CConnection::ConnectionPtr GetConnectionByUUID( std::string uuid_,  boost::asio::io_service& ios,  CDispatcher &dispatch_ );
+    CConnection::ConnectionPtr GetConnectionByUUID( std::string uuid_,  boost::asio::io_service& ios );
 
     /// An iterator to the beginning of the hostname map
     hostnamemap::iterator GetHostnamesBegin() { return m_hostnames.begin(); };

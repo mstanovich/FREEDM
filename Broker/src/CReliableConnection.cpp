@@ -60,9 +60,8 @@ namespace freedm {
 /// @param uuid: The uuid this node connects to, or what listener.
 ///////////////////////////////////////////////////////////////////////////////
 CReliableConnection::CReliableConnection(boost::asio::io_service& p_ioService,
-  CDispatcher& p_dispatch, std::string uuid)
+  std::string uuid)
   : m_socket(p_ioService),
-    m_dispatch(p_dispatch),
     m_uuid(uuid)
 {
     Logger::Debug << __PRETTY_FUNCTION__ << std::endl;
@@ -92,7 +91,7 @@ std::string CReliableConnection::GetUUID()
 /// Get the dispatcher
 CDispatcher& CReliableConnection::GetDispatcher()
 { 
-    return m_dispatch;
+    return CDispatcher::instance();
 };
 
 /// Get the connection Manager

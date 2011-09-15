@@ -61,8 +61,7 @@ public:
     /// The Listener Shared pointer type
     typedef boost::shared_ptr<CListener> ConnectionPtr;
     /// Construct a CConnection with the given io_service.
-    explicit CListener(boost::asio::io_service& p_ioService,
-            CDispatcher& p_dispatch, std::string uuid);
+    explicit CListener(boost::asio::io_service& p_ioService,std::string uuid);
 
     /// Start the first asynchronous operation for the CConnection.
     void Start();

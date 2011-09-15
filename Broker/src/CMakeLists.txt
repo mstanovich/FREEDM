@@ -12,11 +12,6 @@ set(
     CPhysicalDeviceManager.cpp
     CGenericDevice.cpp
     gm/GroupManagement.cpp
-    lb/CLineClient.cpp
-    lb/LoadBalance.cpp
-    lb/LBPeerNode.cpp
-    sc/CStateCollection.cpp
-    sc/SCPeerNode.cpp    
     )
 
 # set BROKER_VERSION macro : cp version.h.cmake version.h

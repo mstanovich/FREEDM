@@ -62,9 +62,8 @@ namespace freedm {
 ///   handlers to messages.
 /// @param uuid: The uuid this node connects to, or what listener.
 ///////////////////////////////////////////////////////////////////////////////
-CListener::CListener(boost::asio::io_service& p_ioService,
-  CDispatcher& p_dispatch, std::string uuid)
-  : CReliableConnection(p_ioService,p_dispatch,uuid)
+CListener::CListener(boost::asio::io_service& p_ioService, std::string uuid)
+  : CReliableConnection(p_ioService,uuid)
 {
     Logger::Debug << __PRETTY_FUNCTION__ << std::endl;
 }
@@ -117,7 +116,7 @@ void CListener::SendACK(std::string uuid, std:: string hostname, unsigned int se
     m_.SetStatus(freedm::broker::CMessage::Accepted);
     m_.SetSequenceNumber(sequenceno);
     Logger::Info<<"Send ACK #"<<sequenceno<<std::endl;
-    GetConnectionManager().GetConnectionByUUID(uuid, GetSocket().get_io_service(), GetDispatcher())->Send(m_,false);
+    GetConnectionManager().GetConnectionByUUID(uuid, GetSocket().get_io_service())->Send(m_,false);
 }
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -170,8 +169,7 @@ void CListener::HandleRead(const boost::system::error_code& e, std::size_t bytes
             {
                 Logger::Info << "Got ACK #" << sequenceno << std::endl;
                 GetConnectionManager().PutHostname(uuid,hostname);
-                GetConnectionManager().GetConnectionByUUID(uuid, GetSocket().get_io_service(), 
-                    GetDispatcher())->RecieveACK(sequenceno);
+                GetConnectionManager().GetConnectionByUUID(uuid, GetSocket().get_io_service())->RecieveACK(sequenceno);
             }
             else if(m_message.GetStatus() == freedm::broker::CMessage::Created)
             {

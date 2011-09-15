@@ -62,9 +62,8 @@ namespace freedm {
 ///   handlers to messages.
 /// @param uuid The uuid this node connects to, or what listener.
 ///////////////////////////////////////////////////////////////////////////////
-CConnection::CConnection(boost::asio::io_service& p_ioService,
-  CDispatcher& p_dispatch, std::string uuid)
-  : CReliableConnection(p_ioService,p_dispatch,uuid),
+CConnection::CConnection(boost::asio::io_service& p_ioService, std::string uuid)
+  : CReliableConnection(p_ioService,uuid),
     m_timeout( p_ioService)
 {
     Logger::Debug << __PRETTY_FUNCTION__ << std::endl;

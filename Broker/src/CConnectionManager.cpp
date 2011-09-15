@@ -196,7 +196,7 @@ std::string CConnectionManager::GetHostnameByUUID(std::string uuid) const
 ///         some reason.
 ///////////////////////////////////////////////////////////////////////////////
 ConnectionPtr CConnectionManager::GetConnectionByUUID
-    (std::string uuid_, boost::asio::io_service& ios,  CDispatcher &dispatch_)
+    (std::string uuid_, boost::asio::io_service& ios)
 {
     Logger::Debug << __PRETTY_FUNCTION__ << std::endl;
 
@@ -233,7 +233,7 @@ ConnectionPtr CConnectionManager::GetConnectionByUUID
     s_ = mapIt_->second;
 
     // Create a new CConnection object for this host	
-    c_.reset(new CConnection(ios, dispatch_, uuid_));  
+    c_.reset(new CConnection(ios, uuid_));  
    
     // Initiate the TCP connection
     //XXX Right now, the port is hardcoded  

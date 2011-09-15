@@ -261,21 +261,17 @@ int main (int argc, char* argv[])
                        << " " << m_phyManager.GetDevice("gendev1")->Get("Vout")
                        << std::endl;
 
-
-        // Instantiate Dispatcher for message delivery 
-        freedm::broker::CDispatcher dispatch_;
-    
         // Register UUID handler
         //dispatch_.RegisterWriteHandler( "any", &uuidHandler_ );
 
         // Run server in background thread          
-        freedm::broker::CBroker broker_(dispatch_, m_ios);
+        freedm::broker::CBroker broker_(m_ios);
 
 
 
         // Instantiate and register the group management module
-        freedm::GMAgent GM_ (uuidstr, broker_.GetIOService(), dispatch_);     
-        dispatch_.RegisterReadHandler( "gm", &GM_);
+        freedm::GMAgent GM_ (uuidstr, broker_.GetIOService());     
+        freedm::broker::CDispatcher::instance().RegisterReadHandler( "gm", &GM_);
 
         // Instantiate and register the power management module
         //freedm::lbAgent LB_ (uuidstr, broker_.get_io_service(), dispatch_, m_conManager);     

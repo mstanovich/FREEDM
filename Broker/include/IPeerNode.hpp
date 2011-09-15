@@ -70,7 +70,7 @@ class IPeerNode
   , private boost::noncopyable
 {
     public:
-        IPeerNode(std::string uuid, boost::asio::io_service& ios, freedm::broker::CDispatcher& dispatch);
+        IPeerNode(std::string uuid, boost::asio::io_service& ios);
         /////////////////////////////////////////////////////////////
         /// @fn IPeerNode::GetStatus
         /// @description returns the status stored in the node as an
@@ -102,12 +102,6 @@ class IPeerNode
         ///   peer node was constructed with.
         /////////////////////////////////////////////////////////////
         boost::asio::io_service& GetIOService() { return m_ios; };
-        /////////////////////////////////////////////////////////////
-        /// @fn IPeerNode::GetDispatcher
-        /// @description Returns a reference to the dispatcher this
-        ///   peer node was constructed with.
-        /////////////////////////////////////////////////////////////
-        freedm::broker::CDispatcher& GetDispatcher() { return m_dispatch; };
         ///Sends a message to peer
         bool Send(freedm::broker::CMessage msg);
         ///Depreciated.
@@ -117,7 +111,6 @@ class IPeerNode
     private:
         std::string m_uuid; /// This node's uuid.
         boost::asio::io_service& m_ios; /// io_service to connect with
-        freedm::broker::CDispatcher& m_dispatch; /// Message handling dispatcher.
         int m_status;
 };
 

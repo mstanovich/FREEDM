@@ -60,7 +60,7 @@ public:
 
     /// Construct a CConnection with the given io_service.
     explicit CReliableConnection(boost::asio::io_service& p_ioService, 
-      CDispatcher& p_dispatch, std::string uuid);
+      std::string uuid);
 
     /// Get the socket associated with the CConnection.
     boost::asio::ip::udp::socket& GetSocket();
@@ -103,9 +103,6 @@ private:
     /// Socket for the CConnection.
     boost::asio::ip::udp::socket m_socket;
 
-    /// The dispatcher used to process the incoming request.
-    CDispatcher& m_dispatch;
- 
     /// The UUID of the remote endpoint for the connection
     std::string m_uuid;
 

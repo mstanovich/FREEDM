@@ -70,11 +70,10 @@ namespace freedm {
 /// @param m_conMan The connection manager used by this broker.
 /// @limiations Fails if the port is already in use.
 ///////////////////////////////////////////////////////////////////////////////
-CBroker::CBroker(CDispatcher &p_dispatch, boost::asio::io_service &m_ios)
+CBroker::CBroker(boost::asio::io_service &m_ios)
     : m_ioService(m_ios),
-      m_dispatch(p_dispatch),
-      m_newConnection(new CListener(m_ioService, m_dispatch,
-                        CGlobalConfiguration::instance().GetUUID()))
+      m_newConnection(new CListener(m_ioService,
+        CGlobalConfiguration::instance().GetUUID()))
 {
     Logger::Debug << __PRETTY_FUNCTION__ << std::endl;
     // Open the acceptor with the option to reuse the address (i.e. SO_REUSEADDR).

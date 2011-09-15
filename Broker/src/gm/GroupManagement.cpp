@@ -177,9 +177,8 @@ unsigned int GMAgent::MurmurHash2 ( const void * p_key, int p_len)
 /// @param p_dispatch: The dispatcher used by this module
 /// @param p_conManager: The connection manager to use in this class.
 ///////////////////////////////////////////////////////////////////////////////
-GMAgent::GMAgent(std::string p_uuid, boost::asio::io_service &p_ios,
-               freedm::broker::CDispatcher &p_dispatch):
-  GMPeerNode(p_uuid,p_ios,p_dispatch),
+GMAgent::GMAgent(std::string p_uuid, boost::asio::io_service &p_ios):
+  GMPeerNode(p_uuid,p_ios),
   m_timer(p_ios)
 {
   Logger::Debug << __PRETTY_FUNCTION__ << std::endl;
@@ -1066,7 +1065,7 @@ GMAgent::PeerNodePtr GMAgent::AddPeer(std::string uuid)
 {
   Logger::Debug << __PRETTY_FUNCTION__ << std::endl;
   PeerNodePtr tmp_;
-  tmp_.reset(new GMPeerNode(uuid,GetIOService(),GetDispatcher()));
+  tmp_.reset(new GMPeerNode(uuid,GetIOService()));
   InsertInPeerSet(m_AllPeers,tmp_);
   return tmp_;
 }
