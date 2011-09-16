@@ -234,8 +234,6 @@ int main (int argc, char* argv[])
         //constructors for initial mapping
         //freedm::broker::CConnectionManager m_conManager(u_,std::string(hostname_));
         freedm::broker::CPhysicalDeviceManager m_phyManager;
-        freedm::broker::ConnectionPtr m_newConnection;
-        boost::asio::io_service m_ios;
 
         // Intialize Devices
         freedm::broker::CGenericDevice::DevicePtr m_gendev0(
@@ -264,13 +262,8 @@ int main (int argc, char* argv[])
         // Register UUID handler
         //dispatch_.RegisterWriteHandler( "any", &uuidHandler_ );
 
-        // Run server in background thread          
-        freedm::broker::CBroker broker_(m_ios);
-
-
-
         // Instantiate and register the group management module
-        freedm::GMAgent GM_ (uuidstr, broker_.GetIOService());     
+        freedm::GMAgent GM_ (uuidstr, broker::CBroker::instance().GetIOService());     
         freedm::broker::CDispatcher::instance().RegisterReadHandler( "gm", &GM_);
 
         // Instantiate and register the power management module
@@ -320,7 +313,7 @@ int main (int argc, char* argv[])
 
         Logger::Info << "Starting CBroker thread" << std::endl;
         boost::thread thread_
-            (boost::bind(&freedm::broker::CBroker::Run, &broker_));
+            (boost::bind(&freedm::broker::CBroker::Run, &broker::CBroker::instance()));
 
         // Restore previous signals.
         pthread_sigmask(SIG_SETMASK, &old_mask, 0); 
@@ -343,7 +336,7 @@ int main (int argc, char* argv[])
         GM_.Stop();
 
         // Stop the server.
-        broker_.Stop();
+        broker::CBroker::instance().Stop();
        
         // Bring in threads.
         thread_.join();

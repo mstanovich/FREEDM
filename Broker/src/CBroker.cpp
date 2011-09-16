@@ -63,16 +63,10 @@ namespace freedm {
 /// @pre The port is free to be bound to.
 /// @post An acceptor socket is bound on the freedm port awaiting connections
 ///       from other nodes.
-/// @param p_address The address to bind the listening socket to.
-/// @param p_port The port to bind the listening socket to.
-/// @param p_dispatch The message dispatcher associated with this Broker
-/// @param m_ios The ioservice used by this broker to perform socket operations
-/// @param m_conMan The connection manager used by this broker.
 /// @limiations Fails if the port is already in use.
 ///////////////////////////////////////////////////////////////////////////////
-CBroker::CBroker(boost::asio::io_service &m_ios)
-    : m_ioService(m_ios),
-      m_newConnection(new CListener(m_ioService,
+CBroker::CBroker()
+    : m_newConnection(new CListener(m_ioService,
         CGlobalConfiguration::instance().GetUUID()))
 {
     Logger::Debug << __PRETTY_FUNCTION__ << std::endl;

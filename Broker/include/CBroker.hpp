@@ -48,6 +48,8 @@
 #include "CConnectionManager.hpp"
 #include "CDispatcher.hpp"
 
+#include "templates/Singleton.hpp"
+
 #include <boost/asio.hpp>
 #include <string>
 #include <boost/noncopyable.hpp>
@@ -56,13 +58,12 @@ namespace freedm {
     namespace broker {
 
 /// Central monolith of the Broker Architecture.
-class CBroker : private boost::noncopyable
+class CBroker : public templates::Singleton<CBroker>
 {
 
 public:
-    /// Initialize the broker and begin accepting connections and messages from
-    /// other nodes and modules.
-    explicit CBroker(boost::asio::io_service &m_ios);
+    /// Initialize the broker and begin accepting connections and messages
+    CBroker();
 
     /// Run the Server's io_service loop.
     void Run();
@@ -81,7 +82,7 @@ public:
     void HandleAccept(const boost::system::error_code& e);
 
     /// The io_service used to perform asynchronous operations.
-    boost::asio::io_service &m_ioService;
+    boost::asio::io_service m_ioService;
 
     ///The Broker's pointer to the listening socket
     CListener::ConnectionPtr m_newConnection;
