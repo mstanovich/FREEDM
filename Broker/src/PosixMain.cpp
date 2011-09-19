@@ -243,8 +243,8 @@ int main (int argc, char* argv[])
             new freedm::broker::CGenericDevice(m_phyManager,std::string("gendev1")));
 
         // Register Devices
-        m_phyManager.AddDevice(m_gendev0);
-        m_phyManager.AddDevice(m_gendev1);
+        freedm::broker::CPhysicalDeviceManager::instance().AddDevice(m_gendev0);
+        freedm::broker::CPhysicalDeviceManager::instance().AddDevice(m_gendev1);
         
         // Quick Test
         m_gendev0->Set("Vout",3.14);
@@ -255,8 +255,8 @@ int main (int argc, char* argv[])
                        << " " << m_gendev1->Get("Vout") << std::endl;
         
         Logger::Notice << "Devices Check 2! "
-                       << m_phyManager.GetDevice("gendev0")->Get("Vout")
-                       << " " << m_phyManager.GetDevice("gendev1")->Get("Vout")
+                       << broker::CPhysicalDeviceManager::instance().GetDevice("gendev0")->Get("Vout")
+                       << broker::CPhysicalDeviceManager::instance().GetDevice("gendev1")->Get("Vout")
                        << std::endl;
 
         // Register UUID handler
@@ -296,7 +296,7 @@ int main (int argc, char* argv[])
                 // Add the UUID to the list of known hosts
                 //XXX This mechanism sould change to allow dynamically arriving 
                 //nodes with UUIDS not constructed using their DNS names   
-                freedm::broker::CConnectionManager::instance().PutHostname(uu_.str(), host_);
+                freedm::broker::CConnectionManager::instance().PutHostname(uu_.str(), host_, port1_);
             }                                                                                               
         } 
         else 
@@ -304,7 +304,7 @@ int main (int argc, char* argv[])
             Logger::Info << "Not adding any hosts on startup." << std::endl;
         }    
         // Add the local connection to the hostname list
-        freedm::broker::CConnectionManager::instance().PutHostname(uuidstr,"localhost");
+        freedm::broker::CConnectionManager::instance().PutHostname(uuidstr,"localhost",port_);
         // Block all signals for background thread.
         sigset_t new_mask;
         sigfillset(&new_mask);

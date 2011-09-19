@@ -34,6 +34,7 @@
 #define PHYSICALDEVICEMANAGER_HPP
 
 #include "IPhysicalDevice.hpp"
+#include "templates/Singleton.hpp"
 
 #include <string>
 #include <map>
@@ -48,7 +49,7 @@ class IPhysicalDevice;
 
 /// Manages open connections so that they may be cleanly stopped
 class CPhysicalDeviceManager
-    : private boost::noncopyable
+    : public templates::Singleton<CPhysicalDeviceManager>
 {
 public:
     /// A typedef for the mapping of identifier to device ptrs

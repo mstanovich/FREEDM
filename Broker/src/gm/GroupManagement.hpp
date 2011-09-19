@@ -56,6 +56,7 @@ using boost::property_tree::ptree;
 #include "CConnection.hpp"
 #include "templates/Singleton.hpp"
 #include "utility/uuid.hpp"
+#include "types/remotehost.hpp"
 
 using boost::asio::ip::tcp;
 

@@ -1105,7 +1105,7 @@ int GMAgent::Run()
 {
   Logger::Debug << __PRETTY_FUNCTION__ << std::endl;
 
-  std::map<std::string, std::string>::iterator mapIt_;
+  std::map<std::string, broker::remotehost>::iterator mapIt_;
 
   for( mapIt_ = broker::CConnectionManager::instance().GetHostnamesBegin();
        mapIt_ != broker::CConnectionManager::instance().GetHostnamesEnd();

@@ -107,7 +107,7 @@ void CListener::Stop()
 /// @post If the sender is not already in the hostname table it will be added.
 ///   then a connection is established to that node and an acknowledgment sent.
 //////////////////////////////////////////////////////////////////////////////
-void CListener::SendACK(std::string uuid, std:: string hostname, unsigned int sequenceno)
+void CListener::SendACK(std::string uuid, remotehost hostname, unsigned int sequenceno)
 {
     Logger::Debug << __PRETTY_FUNCTION__ << std::endl;
     freedm::broker::CMessage m_;
@@ -150,7 +150,7 @@ void CListener::HandleRead(const boost::system::error_code& e, std::size_t bytes
             ptree x = static_cast<ptree>(m_message); 
             unsigned int sequenceno = m_message.GetSequenceNumber();
             std::string uuid = m_message.GetSourceUUID();
-            std::string hostname = m_message.GetSourceHostname();
+            remotehost hostname = m_message.GetSourceHostname();
             #ifdef CUSTOMNETWORK
             if((rand()%100) >= GetReliability())
             {

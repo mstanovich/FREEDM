@@ -92,7 +92,7 @@ class IPeerNode
         /// @description Returns the hostname of this peer node as a
         ///              string
         /////////////////////////////////////////////////////////////
-        std::string GetHostname() const { return broker::CConnectionManager::instance().GetHostnameByUUID(GetUUID()); };
+        std::string GetHostname() const { return broker::CConnectionManager::instance().GetHostnameByUUID(GetUUID()).hostname; };
 
         /// Gives a connection ptr to this peer
         broker::ConnectionPtr GetConnection();
