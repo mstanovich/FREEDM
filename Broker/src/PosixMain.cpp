@@ -52,6 +52,7 @@ namespace po = boost::program_options;
 #include "CUUIDHandler.hpp"
 #include "gm/GroupManagement.hpp"
 #include "lb/LoadBalance.hpp"
+#include "sc/CStateCollection.hpp"
 #include "CConnectionManager.hpp"
 #include "CPhysicalDeviceManager.hpp"
 #include "CGenericDevice.hpp"
@@ -276,8 +277,12 @@ int main (int argc, char* argv[])
         dispatch_.RegisterReadHandler( "gm", &GM_);
 
         // Instantiate and register the power management module
-        //freedm::lbAgent LB_ (uuidstr, broker_.get_io_service(), dispatch_, m_conManager);     
-        //dispatch_.RegisterReadHandler( "lb", &LB_);
+        freedm::lbAgent LB_ (uuidstr, broker_.GetIOService(), dispatch_, m_conManager);     
+        dispatch_.RegisterReadHandler( "lb", &LB_);
+
+        // Instantiate and register the power management module
+        freedm::SCAgent SC_ (uuidstr, broker_.GetIOService(), dispatch_, m_conManager);     
+        dispatch_.RegisterReadHandler( "sc", &SC_);
 
         // The peerlist should be passed into constructors as references or pointers
         // to each submodule to allow sharing peers. NOTE this requires thread-safe
@@ -329,7 +334,8 @@ int main (int argc, char* argv[])
         
         Logger::Info << "Starting thread of Modules" << std::endl;
         boost::thread thread2_( boost::bind(&freedm::GMAgent::Run, &GM_)      
-        //                      , boost::bind(&freedm::lbAgent::LB, &LB_)
+                              , boost::bind(&freedm::lbAgent::LB, &LB_)
+                              , boost::bind(&freedm::SCAgent::SC, &SC_)
                               );
 
         // Wait for signal indicating time to shut down.
