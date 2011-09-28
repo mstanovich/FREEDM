@@ -118,55 +118,59 @@ void CConnection::Stop()
 void CConnection::Send(CMessage p_mesg, bool sequence)
 {
     Logger::Debug << __PRETTY_FUNCTION__ << std::endl;
-
-    #ifdef DATAGRAM
-    sequence = false;
-    #endif
-
-    //Make a call to the dispatcher to sign the messages
-    //With a bunch of shiny stuff.
-    ptree x = static_cast<ptree>(p_mesg);
-    unsigned int msgseq;
-
-    //m_dispatch.HandleWrite(x);  
-
-    CMessage outmsg(x);
-
-    // Sign the message with the hostname, uuid, and squencenumber
-    if(sequence == true)
     {
-        if(m_synched == false)
-        {
-            m_synched = true;
-            SendSYN();
-        }
-        msgseq = m_outsequenceno;
-        outmsg.SetSequenceNumber(msgseq);
-        m_outsequenceno = (m_outsequenceno+1) % GetSequenceModulo();
-    }
-    outmsg.SetSourceUUID(GetConnectionManager().GetUUID()); 
-    outmsg.SetSourceHostname(GetConnectionManager().GetHostname());
+        boost::lock_guard< boost::mutex > scopedLock_( m_Mutex ); 
 
-    if(sequence == true)
-    {
-        // If it isn't squenced then don't put it in the queue.
-        m_queue.Push( QueueItem(msgseq,outmsg) );
-    }
-    // Before, we would put it into a queue to be sent later, now we are going
-    // to immediately write it to channel.
+        #ifdef DATAGRAM
+        sequence = false;
+        #endif
 
-    if(m_queue.size() <= GetWindowSize() || sequence == false)
-    {
-        // Only try to write to the socket if the window isn't already full.
-        // Or it is an unsequenced message
-        
-        HandleSend(outmsg);
+        //Make a call to the dispatcher to sign the messages
+        //With a bunch of shiny stuff.
+        ptree x = static_cast<ptree>(p_mesg);
+        unsigned int msgseq;
+
+        //m_dispatch.HandleWrite(x);  
+
+        CMessage outmsg(x);
+
+        // Sign the message with the hostname, uuid, and squencenumber
         if(sequence == true)
         {
-            m_timeout.cancel();
-            m_timeout.expires_from_now(boost::posix_time::milliseconds(500));
-            m_timeout.async_wait(boost::bind(&CConnection::Resend,this,
-                boost::asio::placeholders::error));
+            if(m_synched == false)
+            {
+                m_synched = true;
+                SendSYN();
+            }
+            msgseq = m_outsequenceno;
+            outmsg.SetSequenceNumber(msgseq);
+            m_outsequenceno = (m_outsequenceno+1) % GetSequenceModulo();
+        }
+        outmsg.SetSourceUUID(GetConnectionManager().GetUUID()); 
+        outmsg.SetSourceHostname(GetConnectionManager().GetHostname());
+
+        if(sequence == true)
+        {
+            // If it isn't squenced then don't put it in the queue.
+            m_queue.Push( QueueItem(msgseq,outmsg) );
+        }
+        // Before, we would put it into a queue to be sent later, now we are going
+        // to immediately write it to channel.
+
+        if(m_queue.size() <= GetWindowSize() || sequence == false)
+        {
+            // Only try to write to the socket if the window isn't already full.
+            // Or it is an unsequenced message
+            
+            GetSocket().get_io_service().post(boost::bind(&CConnection::HandleSend,
+                this,outmsg));
+            if(sequence == true)
+            {
+                m_timeout.cancel();
+                m_timeout.expires_from_now(boost::posix_time::milliseconds(500));
+                m_timeout.async_wait(boost::bind(&CConnection::Resend,this,
+                    boost::asio::placeholders::error));
+            }
         }
     }
 }
@@ -181,25 +185,28 @@ void CConnection::Send(CMessage p_mesg, bool sequence)
 void CConnection::HandleSend(CMessage msg)
 {
     Logger::Debug << __PRETTY_FUNCTION__ << std::endl;
-    boost::tribool result_;
-    boost::array<char, 8192>::iterator it_;
-
-    it_ = m_buffer.begin();
-    boost::tie( result_, it_ ) = Synthesize( msg, it_, m_buffer.end() - it_ );
-
-    #ifdef CUSTOMNETWORK
-    if((rand()%100) >= GetReliability()) 
     {
-        Logger::Info<<"Outgoing Packet Dropped ("<<GetReliability()
-                      <<") -> "<<GetUUID()<<std::endl;
-        return;
-    }
-    #endif
+        boost::lock_guard< boost::mutex > scopedLock_( m_Mutex ); 
+        boost::tribool result_;
+        boost::array<char, 8192>::iterator it_;
 
-    GetSocket().async_send(boost::asio::buffer(m_buffer,
-            (it_ - m_buffer.begin()) * sizeof(char) ), 
-        boost::bind(&CConnection::HandleWrite, this,
-        boost::asio::placeholders::error));
+        it_ = m_buffer.begin();
+        boost::tie( result_, it_ ) = Synthesize( msg, it_, m_buffer.end() - it_ );
+
+        #ifdef CUSTOMNETWORK
+        if((rand()%100) >= GetReliability()) 
+        {
+            Logger::Info<<"Outgoing Packet Dropped ("<<GetReliability()
+                          <<") -> "<<GetUUID()<<std::endl;
+            return;
+        }
+        #endif
+
+        GetSocket().async_send(boost::asio::buffer(m_buffer,
+                (it_ - m_buffer.begin()) * sizeof(char) ), 
+            boost::bind(&CConnection::HandleWrite, this,
+            boost::asio::placeholders::error));
+    }
 }
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -281,26 +288,29 @@ void CConnection::SendSYN()
 void CConnection::RecieveACK(unsigned int sequenceno)
 {
     Logger::Debug << __PRETTY_FUNCTION__ << std::endl;
-    while(!m_queue.IsEmpty())
     {
-        unsigned int bounda = m_queue.front().first;
-        unsigned int boundb = (m_queue.front().first+(GetWindowSize()))%GetSequenceModulo();
-        Logger::Debug<<"ACK, bounda:"<<bounda<<" boundb:"<<boundb<<"input: "<<sequenceno<<std::endl;
-        if(bounda <= sequenceno || (sequenceno < boundb && boundb < bounda))
+        boost::lock_guard< boost::mutex > scopedLock_( m_Mutex ); 
+        while(!m_queue.IsEmpty())
         {
-            Logger::Info<<"ACK handled for "<<m_queue.front().first<<std::endl;
-            m_queue.pop();
-            m_timeouts = 0;
+            unsigned int bounda = m_queue.front().first;
+            unsigned int boundb = (m_queue.front().first+(GetWindowSize()))%GetSequenceModulo();
+            Logger::Debug<<"ACK, bounda:"<<bounda<<" boundb:"<<boundb<<"input: "<<sequenceno<<std::endl;
+            if(bounda <= sequenceno || (sequenceno < boundb && boundb < bounda))
+            {
+                Logger::Info<<"ACK handled for "<<m_queue.front().first<<std::endl;
+                m_queue.pop();
+                m_timeouts = 0;
+            }
+            else
+            {
+                break;
+            }
         }
-        else
+        if(!m_queue.IsEmpty())
         {
-            break;
+            GetSocket().get_io_service().post(
+                boost::bind(&CConnection::HandleResend, this));
         }
-    }
-    if(!m_queue.IsEmpty())
-    {
-        GetSocket().get_io_service().post(
-            boost::bind(&CConnection::HandleResend, this));
     }
 }
 ///////////////////////////////////////////////////////////////////////////////

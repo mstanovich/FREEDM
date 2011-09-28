@@ -141,6 +141,7 @@ void CConnectionManager::Stop (CConnection::ConnectionPtr c)
     Logger::Debug << __PRETTY_FUNCTION__ << std::endl;
     if(m_connections.right.count(c))
     {
+        boost::lock_guard< boost::mutex > scopedLock_( m_Mutex );
         m_connections.right.erase(c);
     }
     c->Stop();
@@ -220,56 +221,58 @@ ConnectionPtr CConnectionManager::GetConnectionByUUID
     (std::string uuid_, boost::asio::io_service& ios)
 {
     Logger::Debug << __PRETTY_FUNCTION__ << std::endl;
-
     ConnectionPtr c_;  
-    std::string s_,port;
-
-    // See if there is a connection in the open connections already
-    if(m_connections.left.count(uuid_))
     {
-        if(m_connections.left.at(uuid_)->GetSocket().is_open())
+        boost::lock_guard< boost::mutex > scopedLock_( m_GetConnectionMutex );
+        std::string s_,port;
+
+        // See if there is a connection in the open connections already
+        if(m_connections.left.count(uuid_))
         {
-            Logger::Info << "Recycling connection to " << uuid_ << std::endl;
-            #ifdef CUSTOMNETWORK
-            LoadNetworkConfig();
-            #endif
-            return m_connections.left.at(uuid_);
-        }
-        else
-        {
-            Logger::Info <<" Connection to " << uuid_ << " has gone stale " << std::endl;
-            //The socket is not marked as open anymore, we
-            //should stop it.
-            Stop(m_connections.left.at(uuid_));
-        }
-    }  
+            if(m_connections.left.at(uuid_)->GetSocket().is_open())
+            {
+                Logger::Info << "Recycling connection to " << uuid_ << std::endl;
+                #ifdef CUSTOMNETWORK
+                LoadNetworkConfig();
+                #endif
+                return m_connections.left.at(uuid_);
+            }
+            else
+            {
+                Logger::Info <<" Connection to " << uuid_ << " has gone stale " << std::endl;
+                //The socket is not marked as open anymore, we
+                //should stop it.
+                Stop(m_connections.left.at(uuid_));
+            }
+        }  
 
-    Logger::Info << "Making Fresh Connection to " << uuid_ << std::endl;
+        Logger::Info << "Making Fresh Connection to " << uuid_ << std::endl;
 
-    // Find the requested host from the list of known hosts
-    std::map<std::string, remotehost>::iterator mapIt_;
-    mapIt_ = m_hostnames.find(uuid_);
-    if(mapIt_ == m_hostnames.end())
-        return ConnectionPtr();
-    s_ = mapIt_->second.hostname;
-    port = mapIt_->second.port;
+        // Find the requested host from the list of known hosts
+        std::map<std::string, remotehost>::iterator mapIt_;
+        mapIt_ = m_hostnames.find(uuid_);
+        if(mapIt_ == m_hostnames.end())
+            throw EUnknownUUID();
+        s_ = mapIt_->second.hostname;
+        port = mapIt_->second.port;
 
-    // Create a new CConnection object for this host	
-    c_.reset(new CConnection(ios, uuid_));  
-   
-    // Initiate the TCP connection
-    //XXX Right now, the port is hardcoded  
-    boost::asio::ip::udp::resolver resolver(ios);
-    boost::asio::ip::udp::resolver::query query( s_, port);
-    boost::asio::ip::udp::endpoint endpoint = *resolver.resolve( query );
-    c_->GetSocket().connect( endpoint ); 
+        // Create a new CConnection object for this host	
+        c_.reset(new CConnection(ios, uuid_));  
+       
+        // Initiate the TCP connection
+        //XXX Right now, the port is hardcoded  
+        boost::asio::ip::udp::resolver resolver(ios);
+        boost::asio::ip::udp::resolver::query query( s_, port);
+        boost::asio::ip::udp::endpoint endpoint = *resolver.resolve( query );
+        c_->GetSocket().connect( endpoint ); 
 
-    //Once the connection is built, connection manager gets a call back to register it.    
-    PutConnection(uuid_,c_);
-    #ifdef CUSTOMNETWORK
-    LoadNetworkConfig();
-    #endif
-    return c_;
+        //Once the connection is built, connection manager gets a call back to register it.    
+        PutConnection(uuid_,c_);
+        #ifdef CUSTOMNETWORK
+        LoadNetworkConfig();
+        #endif
+        return c_;
+    }
 }
 
 ///////////////////////////////////////////////////////////////////////////////

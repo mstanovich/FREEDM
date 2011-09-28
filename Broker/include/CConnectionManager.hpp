@@ -47,6 +47,7 @@
 #include <set>
 #include <string>
 #include <map>
+#include <exception>
 #include <boost/foreach.hpp>
 #include <boost/bimap.hpp>
 #include <boost/thread/mutex.hpp>
@@ -129,7 +130,15 @@ public:
     // Transient Network Simulation
     /// Load a network configuration & apply it.
     void LoadNetworkConfig();
-
+    
+    /// Unknown uuid exception.
+    class EUnknownUUID : public std::exception
+    {
+        virtual const char* what() const throw()
+        {
+            return "No UUID by that name in referenced table.";
+        }
+    };
 private:
     /// Mapping from uuid to hostname.
     hostnamemap m_hostnames;
@@ -143,6 +152,8 @@ private:
     std::string m_uuid;
     /// Mutex for protecting the handler maps above
     boost::mutex m_Mutex;       
+    /// Mutex that prevents two connections being constructed simultaenously
+    boost::mutex m_GetConnectionMutex;
 };
 
 } // namespace broker

@@ -117,6 +117,9 @@ private:
  
     /// The sequence number used for the next outgoing message
     unsigned int m_outsequenceno;
+
+    /// Mutex for protecting the handler maps above
+    boost::mutex m_Mutex;
 };
 
 typedef boost::shared_ptr<CConnection> ConnectionPtr;
