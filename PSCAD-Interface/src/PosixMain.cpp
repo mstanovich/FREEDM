@@ -27,7 +27,7 @@
 #include <iostream>
 
 #include "logger.hpp"
-#include "CTableStructure.hpp"
+#include "CDeviceTable.hpp"
 
 CREATE_STD_LOGS()
 
@@ -39,7 +39,7 @@ int main( int argc, char * argv[] )
     // create and test the structure
     try
     {
-        simserv::CTableStructure sample( "sample.xml", "my_table" );
+        simserv::CDeviceTable sample( "sample.xml", "my_table" );
         Logger::Notice << "\n" << sample << std::endl;
     }
     catch( std::exception & e )

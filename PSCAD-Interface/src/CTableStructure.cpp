@@ -61,6 +61,10 @@ void CTableStructure::ReadFile( const std::string & p_xml,
     CDeviceKey dkey;
     SEntry entry;
 
+    // clear old data structures
+    m_IndexToDevice.clear();
+    m_DeviceToEntry.clear();
+    
     // create property tree
     read_xml( p_xml, xml_tree );
     
@@ -83,17 +87,17 @@ void CTableStructure::ReadFile( const std::string & p_xml,
         access_set.clear();
         
         // read each entry attribute
-        index       = subtree.get<size_t>("<xmlattr>.index");
-        device      = subtree.get<std::string>("device");
-        key         = subtree.get<std::string>("key");
-        initial  = subtree.get_optional<TSimulationValue>("initial");
+        index   = subtree.get<size_t>("<xmlattr>.index");
+        device  = subtree.get<std::string>("device");
+        key     = subtree.get<std::string>("key");
+        initial = subtree.get_optional<TSimulationValue>("initial");
 
         // this should use equal_range - but I couldn't get it to work :(
         access_it = subtree.find("access");
         if( access_it == subtree.not_found() )
         {
             // set the default access level to global
-            for( size_t i = 1; i <= m_ControlCount; i++ )
+            for( size_t i = 0; i < m_ControlCount; i++ )
             {
                 access_set.insert(i);
             }
@@ -122,7 +126,7 @@ void CTableStructure::ReadFile( const std::string & p_xml,
         dkey.SetKey(key);
         
         // check for incorrect values
-        if( index == 0 || index > m_TableSize )
+        if( index >= m_TableSize )
         {
             throw std::logic_error("XML File has Invalid Indexes");
         }
@@ -134,11 +138,7 @@ void CTableStructure::ReadFile( const std::string & p_xml,
         {
             throw std::logic_error("XML File has Duplicate Device Keys");
         }
-        if( access_set.size() > 0 && (*access_set.begin()) == 0 )
-        {
-            throw std::logic_error("XML File has Invalid Access Indexes");
-        }
-        if( access_set.size() > 0 && (*access_set.end()) > m_ControlCount )
+        if( access_set.size() > 0 && (*access_set.rbegin()) >= m_ControlCount )
         {
             throw std::logic_error("XML File has Invalid Access Indexes");
         }

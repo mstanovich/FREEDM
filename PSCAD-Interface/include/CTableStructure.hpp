@@ -49,6 +49,7 @@ CREATE_EXTERN_STD_LOGS()
 
 namespace simserv {
 
+/// Defines a device table structure from an xml specification file
 class CTableStructure
 {
 public:

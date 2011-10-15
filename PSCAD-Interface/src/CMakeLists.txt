@@ -7,6 +7,7 @@ set (
     SOURCE_FILES
     CDeviceKey.cpp
     CTableStructure.cpp
+    CDeviceTable.cpp
 )
 
 # set C++ compiler flags
