@@ -6,6 +6,7 @@ include_directories ("${SIMULATION_SERVER_SOURCE_DIR}/src")
 set (
     SOURCE_FILES
     CDeviceKey.cpp
+    CTableStructure.cpp
 )
 
 # set C++ compiler flags

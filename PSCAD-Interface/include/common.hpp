@@ -1,5 +1,5 @@
 ////////////////////////////////////////////////////////////////////////////////
-/// @file           CDeviceKey.cpp
+/// @file           common.hpp
 ///
 /// @author         Thomas Roth <tprfh7@mst.edu>
 ///
@@ -8,6 +8,8 @@
 /// @project        Missouri S&T Power Research Group
 ///
 /// @description    
+///
+/// @functions  
 ///
 /// @license
 /// These source code files were created at the Missouri University of Science
@@ -24,28 +26,13 @@
 /// Science and Technology, Rolla, MO 65401 <ff@mst.edu>.
 ////////////////////////////////////////////////////////////////////////////////
 
-#include <iostream>
+#ifndef SIMSERV_COMMON_HPP
+#define SIMSERV_COMMON_HPP
 
-#include "logger.hpp"
-#include "CTableStructure.hpp"
+namespace simserv {
 
-CREATE_STD_LOGS()
+typedef double TSimulationValue;
 
-int main( int argc, char * argv[] )
-{
-    // set the logger level
-    Logger::Log::setLevel(5);
-    
-    // create and test the structure
-    try
-    {
-        simserv::CTableStructure sample( "sample.xml", "my_table" );
-        Logger::Notice << "\n" << sample << std::endl;
-    }
-    catch( std::exception & e )
-    {
-        Logger::Critical << e.what() << std::endl;
-    }
-    
-    return 0;
-}
+} // namespace simserv
+
+#endif // SIMSERV_COMMON_HPP

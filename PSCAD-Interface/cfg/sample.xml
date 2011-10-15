@@ -1,0 +1,23 @@
+<ControlCount>3</ControlCount>
+
+<my_table>
+    <entry index="1">
+        <device>FirstDevice</device>
+        <key>SomeKey</key>
+    </entry>
+
+    <entry index="2">
+        <device>FirstDevice</device>
+        <key>SomeOtherKey</key>
+        <access>1</access>
+        <access>2</access>
+    </entry>
+
+    <entry index="3">
+        <device>SecondDevice</device>
+        <key>SomeKey</key>
+        <initial>10</initial>
+        <access>1</access>
+    </entry>
+</my_table>
+
