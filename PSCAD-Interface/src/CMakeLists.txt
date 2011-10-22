@@ -8,6 +8,7 @@ set (
     CDeviceKey.cpp
     CTableStructure.cpp
     CDeviceTable.cpp
+    CLineServer.cpp
     IWorker.cpp
 )
 
