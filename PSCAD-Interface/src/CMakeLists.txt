@@ -10,6 +10,7 @@ set (
     CDeviceTable.cpp
     CLineServer.cpp
     IWorker.cpp
+    IWorkerInterface.cpp
 )
 
 # set C++ compiler flags

@@ -28,9 +28,9 @@ namespace simserv {
 
 /// Creates a shared line server instance
 CLineServer::TPointer CLineServer::Create( boost::asio::io_service & p_service,
-    THandler p_handler, unsigned short p_port )
+    unsigned short p_port, THandler p_handler )
 {
-    return TPointer( new CLineServer(p_service, p_handler, p_port) );
+    return TPointer( new CLineServer(p_service, p_port, p_handler) );
 }
 
 /// Closes a line server
@@ -48,11 +48,11 @@ CLineServer::~CLineServer()
 
 /// Creates a line server that uses the given message handler 
 CLineServer::CLineServer( boost::asio::io_service & p_service,
-    THandler p_handler, unsigned short p_port )
+    unsigned short p_port, THandler p_handler )
     : m_acceptor(p_service)
     , m_socket(p_service)
-    , m_handler(p_handler)
     , m_port(p_port)
+    , m_handler(p_handler)
 {
     boost::asio::ip::tcp::endpoint endpt( boost::asio::ip::tcp::v4(), m_port );
     

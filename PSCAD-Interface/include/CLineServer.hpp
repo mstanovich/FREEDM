@@ -57,14 +57,14 @@ public:
     
     /// Creates a shared line server instance
     static TPointer Create( boost::asio::io_service & p_service,
-        THandler p_handler, unsigned short p_port );
+        unsigned short p_port, THandler p_handler );
     
     /// Closes a line server
     ~CLineServer();
 private:
     /// Creates a line server that uses the given message handler 
-    CLineServer( boost::asio::io_service & p_service, THandler p_handler,
-        unsigned short p_port );
+    CLineServer( boost::asio::io_service & p_service, unsigned short p_port,
+        THandler p_handler );
     
     /// Directs client connections to the handle accept function
     void StartAccept();
@@ -78,11 +78,11 @@ private:
     /// socket for the accepted client connection
     boost::asio::ip::tcp::socket m_socket;
     
-    /// callback function that handles client data
-    THandler m_handler;
-    
     /// line server port number
     unsigned short m_port;
+    
+    /// callback function that handles client data
+    THandler m_handler;
 };
 
 } // namespace simserv
