@@ -11,6 +11,7 @@ set (
     CLineServer.cpp
     IWorker.cpp
     IWorkerInterface.cpp
+    CSimulationInterface.cpp
 )
 
 # set C++ compiler flags
