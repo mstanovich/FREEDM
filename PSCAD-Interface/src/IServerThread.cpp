@@ -1,13 +1,11 @@
 ////////////////////////////////////////////////////////////////////////////////
-/// @file           CDeviceKey.cpp
+/// @file           IServerThread.cpp
 ///
 /// @author         Thomas Roth <tprfh7@mst.edu>
 ///
 /// @compiler       C++
 ///
 /// @project        Missouri S&T Power Research Group
-///
-/// @description    
 ///
 /// @license
 /// These source code files were created at the Missouri University of Science
@@ -24,21 +22,25 @@
 /// Science and Technology, Rolla, MO 65401 <ff@mst.edu>.
 ////////////////////////////////////////////////////////////////////////////////
 
-#include <iostream>
-#include "CDeviceTable.hpp"
+#include "IServerThread.hpp"
 
-int main( int argc, char * argv[] )
+namespace freedm {
+namespace simserv {
+
+void IServerThread::Start()
 {
-    // create and test the structure
-    try
-    {
-        freedm::simserv::CDeviceTable sample( "sample.xml", "my_table" );
-        std::cout << "\n" << sample << std::endl;
-    }
-    catch( std::exception & e )
-    {
-        std::cerr << e.what() << std::endl;
-    }
-    
-    return 0;
+    m_thread = boost::thread( &boost::asio::io_service::run, &m_ios );
 }
+
+void IServerThread::Join()
+{
+    m_thread.join();
+}
+
+void IServerThread::Stop()
+{
+    m_ios.stop();
+}
+
+} // namespace simserv
+} // namespace freedm

@@ -5,18 +5,11 @@
 ///
 /// @compiler       C
 ///
-/// @project        Missouri S&T Power Research Group 
+/// @project        Missouri S&T Power Research Group
 ///
-/// @description    Implementation of PSCAD-Socket functions
-///                 Requires the following POSIX headers:
-///                 "netdb.h" ; "sys/socket.h"
+/// @description    
 ///
-/// @functions
-/// itodd( char *, int, int, int, int )
-/// create_log( const char *, const char *, int )
-/// append_log( const char *, const char *, const double *, int )
-/// connect_to_server( const char *, int, const char * )
-/// make_packet( const char *, const double *, int )
+/// @functions  
 ///
 /// @license
 /// These source code files were created at the Missouri University of Science
@@ -33,318 +26,425 @@
 /// Science and Technology, Rolla, MO 65401 <ff@mst.edu>.
 ////////////////////////////////////////////////////////////////////////////////
 
-#include "time.h"
-#include "stdio.h"
-#include "string.h"
+#include <time.h>
+#include <errno.h>
+#include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
 
-#include "netdb.h"
-#include "sys/socket.h"
+#include <sys/socket.h>
+#include <arpa/inet.h>
 
-#define MESSAGE_ACCEPT "OK"
-#define MESSAGE_REJECT "NO"
+#define MSG_MAXLEN  256
+#define MSG_ACCEPT  "OK"
+#define MSG_REJECT  "NO"
 
-////////////////////////////////////////////////////////////////////////////////
-/// @brief  Converts an integer IPv4 address into dot-decimal notation
-/// @pre    addr must be allocated to store at least 16-bytes
-/// @post   addr is modified to hold the conversion result
-/// @param  addr Character array to store the dot-decimal notation
-/// @param  ip1 First octet of the IPv4 address to convert
-/// @param  ip2 Second octet of the IPv4 address to convert
-/// @param  ip3 Third octet of the IPv4 address to convert
-/// @param  ip4 Fourth octet of the IPv4 address to convert
-/// @return strlen(addr), excluding the null-character
-////////////////////////////////////////////////////////////////////////////////
-int itodd( char * addr, int ip1, int ip2, int ip3, int ip4 )
-{
-    return sprintf( addr, "%d.%d.%d.%d", ip1, ip2, ip3, ip4 );
-}
+#define LOG_SEND    "psocket_send.txt"
+#define LOG_RECV    "psocket_recv.txt"
 
-////////////////////////////////////////////////////////////////////////////////
-/// @brief  Creates a new log and initializes it with a basic header
-/// @pre    log must be writable
-/// @post   log is created or erased and filled with a basic header
-/// @param  log Filename of the log to create
-/// @param  addr Address of the remote server
-/// @param  port Port of the remote server  
-////////////////////////////////////////////////////////////////////////////////
-void create_log( const char * log, const char * addr, int port )
+/// Unsigned integer type
+typedef unsigned int uint_t;
+
+/// Create new log file with basic header information
+void log_create( const char * log, const char * addr, int port )
 {
     FILE * fd;
     time_t rawtime;
-    struct tm * timeinfo;
+    struct tm * time_tm;
     
-    // attempt to create the given filename
-    if( (fd = fopen( log, "w" )) != 0 )
+    // open the log file
+    fd = fopen( log, "w" );
+    
+    if( fd == NULL )
     {
-        // get current time
-        time(&rawtime);
-        timeinfo = localtime(&rawtime);
-        
-        // print log header
-        fprintf( fd, "Current Time:   %s", asctime(timeinfo) );
-        fprintf( fd, "Server Address: %s:%d\n", addr, port );
-        fclose(fd);
+        fprintf( stderr, "Failed to write to %s", log );
     }
     else
     {
-        // unable to create the given filename
-        fprintf( stderr, "Unable to create %s", log );
+        // get current time
+        rawtime = time(NULL);
+        time_tm = localtime(&rawtime);
+        
+        if( rawtime == -1 )
+        {
+            fprintf( stderr, "Failed to get time for %s", log );
+        }
+        
+        // print log header
+        fprintf( fd, "Current Time:   %s", asctime(time_tm) );
+        fprintf( fd, "Server Address: %s:%d\n", addr, port );
+        
+        fclose(fd);
     }
 }
 
-////////////////////////////////////////////////////////////////////////////////
-/// @brief  Appends a message and associated floating-point data to a log file
-/// @pre    log must be appendable
-/// @pre    data must contain len entries
-/// @post   msg and data are appended to the end of the log
-/// @param  log Filename of the log to receive the message
-/// @param  msg Message to write to the log
-/// @param  data Floating-point data to write to the log
-/// @param  len Amount of floating-point data to write
-////////////////////////////////////////////////////////////////////////////////
-void append_log( const char *log, const char *msg, const double *data, int len )
+/// Append message and its optional data to a log file
+void log_append( const char *log, const char *msg, cosnt double *data, int len )
 {
     FILE * fd;
     int index;
     
-    // attempt to open the given filename
-    if( (fd = fopen( log, "a" )) != 0 )
+    // open the log file
+    fd = fopen( log, "a" );
+    
+    if( fd == NULL )
     {
-        // print the message
-        fprintf( fd, "%s", msg );
-        
-        // print the data
-        for( index = 0; index < len; index++ )
-        {
-            fprintf( fd, "\t%e", data[index] );
-        }
-
-        fprintf( fd, "\n" );
-        fclose(fd);
+        fprintf( stderr, "Failed to append to %s", log );
     }
     else
     {
-        // unable to open the given filename
-        fprintf( stderr, "Unable to open %s", log );
-    }
-}
-
-////////////////////////////////////////////////////////////////////////////////
-/// @brief  Creates a new socket and connects it to the remote server
-/// @pre    none
-/// @post   client socket created to remote server
-/// @post   log modified if an error occurs
-/// @param  addr Address of the remote server
-/// @param  port Port of the remote server
-/// @param  log Filename of the log to receive errors
-/// @return socket descriptor for the created socket or -1 on error
-////////////////////////////////////////////////////////////////////////////////
-int connect_to_server( const char * addr, int port, const char * log )
-{
-    struct hostent * hostname;
-    struct sockaddr_in server;
-    int client;
-    
-    // resolve the server hostname
-    if( (hostname = gethostbyname(addr)) == 0 )
-    {
-        append_log( log, hstrerror(h_errno), 0, 0 );
-        return -1;
-    }
-    
-    // create the client socket
-    if( (client = socket( AF_INET, SOCK_STREAM, 0 )) == -1 )
-    {
-        append_log( log, strerror(errno), 0, 0 );
-        return -1;
-    }
-    
-    // specify server details
-    server.sin_family = AF_INET;
-    server.sin_port = htons(port);
-    memcpy( &server.sin_addr, hostname->h_addr_list[0], hostname->h_length );
-    
-    // connect to the server
-    if( connect( client, (struct sockaddr *)&server, sizeof(server) ) == -1 )
-    {
-        append_log( log, strerror(errno), 0, 0 );
-        close(client);
-        return -1;
-    }
-    
-    return client;
-}
-
-////////////////////////////////////////////////////////////////////////////////
-/// @brief  Allocates a new packet based on the given header and data
-/// @pre    header should contain at least one byte of information
-/// @pre    len should describe the number of elements in data
-/// @post   memory is allocated for the new packet
-/// @param  header Header to associate with the new packet
-/// @param  data Array of data to associate with the new packet
-/// @param  len Length of the array of packet data
-/// @return pointer to newly allocated packet or null on error
-////////////////////////////////////////////////////////////////////////////////
-void * make_packet( const char * header, const double * data, int len )
-{
-    void * packet;
-    int header_size = strlen(header);
-    int data_size   = len * sizeof(double);
-    int packet_size = header_size + 1 + data_size + 2;    
-    
-    // allocate new packet
-    if( (packet = malloc(packet_size)) != 0 )
-    {
-        // copy data into the packet
-        memcpy( packet, header, header_size );
-        memcpy( packet+header_size, " ", 1 );
-        memcpy( packet+header_size+1, data, data_size );
-        memcpy( packet+header_size+1+data_size, "\r\n", 2 );
-    }
-    
-    return packet;
-}
-
-////////////////////////////////////////////////////////////////////////////////
-/// @brief  
-/// @pre    
-/// @post   
-/// @param  
-////////////////////////////////////////////////////////////////////////////////
-void read_packet( const void *packet, double *data, int len, const char *log )
-{
-    const void * separator;
-    char * header;
-    int header_size;
-    
-    separator = strchr( packet, ' ' );
-
-    if( separator != 0 )
-    {
-        header_size = separator - packet;
-        header = malloc(header_size+1);
-        memcpy( header, packet, header_size );
-        header[header_size] = '\0';
+        // print the message
+        fprintf( fd, "%s\n", msg );
         
-        if( strcmp(header,MESSAGE_ACCEPT) == 0 )
+        // print the optional data
+        for( index = 0; index < len; index++ )
         {
-            if( len-header_size == data_length )
-            {
-                memcpy( data, separator+1, len-header_size, 0 );
-            }
-            else
-            {
-                append_log( log, "Received a corrupt piece of data", 0, 0 );
-            }
+            fprintf( fd, "\t%.3e\n", data[index] );
         }
-        else if( strcmp(header,MESSAGE_REJECT) == 0 )
+        
+        fclose(fd);
+    }
+}
+
+/// Convert four IPv4 octets into dot-decimal notation
+int itodd( char * addr, uint_t ip1, uint_t ip2, uint_t ip3, uint_t ip4 )
+{
+    char * temp = NULL;
+    int result = -1;
+    
+    // test the octets for the appropriate format
+    if( ip1 > 255 || ip2 > 255 || ip3 > 255 || ip4 > 255 )
+    {
+        fprintf( stderr, "Failed to convert IPv4 address to dot-decimal" );
+    }
+    else
+    {
+        // allocate storage for the dot-decimal notation
+        temp = (char *)realloc( addr, (16 * sizeof(char)) );
+        
+        if( temp == NULL )
         {
-            // rejected message
-            append_log( log, separator+1, len-header_size, 0 );
+            fprintf( stderr, "Failed to allocate memory for IPv4 address" );
         }
         else
         {
-            // unrecognized packet header, interpret as corrupt
-            append_log( log, "Received a corrupt packet header", 0, 0 );
+            // move addr
+            addr = temp;
+            
+            // store the dot-decimal notation in addr
+            result = sprintf( addr, "%u.%u.%u.%u", ip1, ip2, ip3, ip4 );
         }
-        
-        free(header);
+    }
+    
+    return result;
+}
+
+/// Creates and returns a client socket connected to a remote server
+int connect_to_server( cosnt char * addr, int port )
+{
+    int sd;
+    struct sockaddr_in saddr;
+    
+    // create the client IPv4 TCP socket
+    if( (sd = socket( PF_INET, SOCK_STREAM, 0 )) == -1 )
+    {
+        fpritnf( stderr, "Failed to create client socket" );
+        return -1;
+    }
+    
+    // set the server IPv4 address
+    saddr.sin_family        = AF_INET;
+    saddr.sin_port          = htons(port);
+    saddr.sin_addr.s_addr   = inet_addr(addr);
+    memset( saddr.sin_zero, 0, sizeof(saddr.sin_zero) );
+    
+    // connect the client to the server
+    if( connect( sd, (struct sockaddr *)&saddr, sizeof(saddr) ) == -1 )
+    {
+        fprintf( stderr, "Failed to connect client to remote server" );
+        close(sd);
+        return -1;
+    }
+    
+    return sd;
+}
+
+/// Encode a packet with a header and its optional data
+int pkt_encode( void * pkt, const char * hdr, const double * data, int len )
+{
+    void * temp = NULL;
+    int hdrlen  = strlen(hdr);
+    int dbytes  = len * sizeof(double);
+    int pktlen  = 0;
+    
+    // calculate the packet size
+    if( dbytes == 0 )
+    {
+        // header + linefeed
+        pktlen = hdrlen + 2;
+    }
+    else if( dbytes > 0 )
+    {
+        // header + delimiter + data + linefeed
+        pktlen = hdrlen + 1 + dbytes + 2;
     }
     else
     {
-        // packet contains no space, interpret as corrupt
-        append_log( log, "Received a corrupt packet", 0, 0 );
+        // skip
+    }
+    
+    // allocate storage for the packet
+    temp = realloc( pkt, pktlen );
+    
+    if( temp == NULL )
+    {
+        fprintf( stderr, "Failed to encode network packet" );
+        return -1;
+    }
+    else
+    {
+        // move pkt
+        pkt = temp;
+        
+        // store packet data
+        if( dbytes == 0 )
+        {
+            // header + linefeed
+            memcpy( pkt, hdr, hdrlen );
+            memcpy( pkt+hdrlen, "\r\n", 2 );
+        }
+        else
+        {
+            // header + delimiter + data + linefeed
+            memcpy( pkt, hdr, hdrlen );
+            memcpy( pkt+hdrlen, " ", 1 );
+            memcpy( pkt+hdrlen+1, data, dbytes );
+            memcpy( pkt+hdrlen+1+dbytes, "\r\n", 2 );
+        }
+    }
+    
+    return pktlen;
+}
+
+/// Decode a packet into its header and optional data
+int pkt_decode( const void * pkt, char * hdr, double * data, int len )
+{
+    const char * delimiter;
+    const char * linefeed;
+    char * temp = NULL;
+    int hdrlen;
+    int dbytes;
+    
+    // find the delimiter and linefeed
+    delimiter   = strchr( pkt, ' ' );
+    linefeed    = strstr( pkt, "\r\n" );
+
+    // check for linefeed existence
+    if( linefeed == NULL )
+    {
+        fprintf( stderr, "Failed to decode packet (corrupt format)" );
+        return -1;
+    }
+    
+    // check for delimiter existence
+    if( delimiter == NULL )
+    {
+        // pkt has no data
+        hdrlen  = linefeed;
+        dbytes  = 0;
+    }
+    else
+    {
+        // pkt has data
+        hdrlen  = delimiter;
+        dbytes  = linefeed - (delimiter + 1);
+    }
+    
+    if( dbytes != len * sizeof(double) )
+    {
+        fprintf( stderr, "Failed to decode packet (corrupt data)" );
+        return -1;
+    }
+    
+    // allocate storage for the header
+    temp = (char *)realloc( hdr, hdrlen+1 );
+    
+    if( temp == NULL )
+    {
+        fprintf( stderr, "Failed to decode packet (allocation)" );
+        return -1;
+    }
+    else
+    {
+        // move hdr
+        hdr = temp;
+        
+        // copy the header
+        memcpy( hdr, pkt, hdrlen );
+        hdr[hdrlen] = '\0';
+        
+        // check for a positive response
+        if( strcmp(hdr,MSG_ACCEPT) != 0 )
+        {
+            fprintf( stderr, "Failed to decode packet (rejection)" );
+            return -1;
+        }
+        
+        // copy the data
+        memcpy( data, delimiter+1, dbytes );
+    }
+    
+    return hdrlen;
+}
+
+/// Creates and prints a header to the send log
+void pscad_send_init__( int * ip1, int * ip2, int * ip3, int * ip4, int * port )
+{
+    char * address;
+    
+    if( itodd( address, *ip1, *ip2, *ip3, *ip4 ) == -1 )
+    {
+        fprintf( stderr, "Failed to create send log" );
+    }
+    else
+    {
+        log_create( LOG_SEND, address, *port );
+        free(address);
     }
 }
 
-////////////////////////////////////////////////////////////////////////////////
-/// @brief  
-/// @pre    
-/// @post   
-/// @param  
-////////////////////////////////////////////////////////////////////////////////
-int send_packet( int sd, const void * data, int bytes, const char * file )
+/// Creates and sends a data packet to the simulation server
+void pscad_send_step__( int * ip1, int * ip2, int * ip3, int * ip4, int * port,
+        double * data, int * length )
 {
+    char * address = NULL;
+    void * packet = NULL;
+    int socket;
+    int bytes;
+    
+    // reformat the server address as a string
+    if( itodd( address, *ip1, *ip2, *ip3, *ip4 ) == -1 )
+    {
+        log_append( LOG_SEND, "Failed to format server address", 0, 0 );
+    }
+    else
+    {
+        // encode the network packet
+        bytes = pkt_encode( packet, "SET", data, *length );
+        
+        if( bytes == -1 )
+        {
+            log_append( LOG_SEND, "Failed to encode network packet", 0, 0 );
+        }
+        else
+        {
+            // connect to the simulation server
+            socket == connect_to_server( address, *port );
+            
+            if( socket == -1 )
+            {
+                log_append( LOG_SEND, "Failed to connect to server", 0, 0 );
+            }
+            else
+            {
+                // send the network packet
+                send( socket, packet, bytes, 0 );
+
+                log_append( LOG_SEND, "SET", data, *length );
+                close(socket);
+            }
+            free(packet);
+        }
+        free(address);
+    }
 }
 
-////////////////////////////////////////////////////////////////////////////////
-/// @brief  
-/// @pre    
-/// @post   
-/// @param  
-////////////////////////////////////////////////////////////////////////////////
-int recv_packet( int sd, void * data, int bytes, const char * file )
-{
-}
-
-////////////////////////////////////////////////////////////////////////////////
-/// @brief  
-/// @pre    
-/// @post   
-/// @param  
-////////////////////////////////////////////////////////////////////////////////
-void pscad_send_zero__()
-{
-}
-
-////////////////////////////////////////////////////////////////////////////////
-/// @brief  
-/// @pre    
-/// @post   
-/// @param  
-////////////////////////////////////////////////////////////////////////////////
-void pscad_send_step__()
-{
-}
-
-////////////////////////////////////////////////////////////////////////////////
-/// @brief  
-/// @pre    
-/// @post   
-/// @param  
-////////////////////////////////////////////////////////////////////////////////
+/// Prints a footer to the send log
 void pscad_send_last__()
 {
+    log_append( LOG_SEND, "Simulation Complete", 0, 0 );
 }
 
-////////////////////////////////////////////////////////////////////////////////
-/// @brief  
-/// @pre    
-/// @post   
-/// @param  
-////////////////////////////////////////////////////////////////////////////////
-void pscad_recv_zero__()
+/// Creates and prints a header to the recv log
+void pscad_recv_init__( int * ip1, int * ip2, int * ip3, int * ip4, int * port )
 {
+    char * address;
+    
+    if( itodd( address, *ip1, *ip2, *ip3, *ip4 ) == -1 )
+    {
+        fprintf( stderr, "Failed to create recv log" );
+    }
+    else
+    {
+        log_create( LOG_RECV, address, *port );
+        free(address);
+    }
 }
 
-////////////////////////////////////////////////////////////////////////////////
-/// @brief  
-/// @pre    
-/// @post   
-/// @param  
-////////////////////////////////////////////////////////////////////////////////
-void pscad_recv_step__()
+/// Requests and receives a data packet from the simulation server
+void pscad_recv_step__( int * ip1, int * ip2, int * ip3, int * ip4, int * port,
+        double * data, int * len )
 {
+    char * address = NULL;
+    void * request = NULL;
+    int socket;
+    int bytes;
+    
+    char * header = NULL;
+    void * buffer = NULL;
+    int length;
+    
+    // reformat the server address as a string
+    if( itodd( address, *ip1, *ip2, *ip3, *ip4 ) == -1 )
+    {
+        log_append( LOG_RECV, "Failed to format server address", 0, 0 );
+    }
+    else
+    {
+        // encode the network packet
+        bytes = pkt_encode( request, "GET", 0, 0 );
+        
+        if( bytes == -1 )
+        {
+            log_append( LOG_RECV, "Failed to encode network packet", 0, 0 );
+        }
+        else
+        {
+            // connect to the simulation server
+            socket == connect_to_server( address, *port );
+            
+            if( socket == -1 )
+            {
+                log_append( LOG_RECV, "Failed to connect to server", 0, 0 );
+            }
+            else
+            {
+                // send the network packet
+                send( socket, request, bytes, 0 );
+                
+                // allocate storage for the buffer
+                length = MSG_MAXLEN + (*len)*sizeof(double);
+                buffer = malloc(length);
+                
+                // receive the server response
+                recv( socket, buffer, length, 0 );
+                
+                // decode the network packet
+                pkt_decode( buffer, header, data, len );
+
+                log_append( LOG_RECV, "GET", data, *len );
+                close(socket);
+                free(buffer);
+                free(header);
+            }
+            free(request);
+        }
+        free(address);
+    }
 }
 
-////////////////////////////////////////////////////////////////////////////////
-/// @brief  
-/// @pre    
-/// @post   
-/// @param  
-////////////////////////////////////////////////////////////////////////////////
+/// Prints a footer to the receive log
 void pscad_recv_last__()
 {
+    log_append( LOG_RECV, "Simulation Complete", 0, 0 );
 }
-
-// recv_zero    create receive log
-// recv_step    attempt to receive data
-// recv_last    terminate receive log
-
-// send_zero    create send log ; send reset message
-// send_step    attempt to send data
-// send_last    terminate send log ; (send quit message?)
-//  may as well send quit even if it isn't used at the moment
-
-// recognized message types:
-//  SET, GET, EXIT, RESET
