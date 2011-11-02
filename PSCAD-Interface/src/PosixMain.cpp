@@ -39,7 +39,7 @@ int main( int argc, char * argv[] )
     // create and test the structure
     try
     {
-        simserv::CDeviceTable sample( "sample.xml", "my_table" );
+        freedm::simserv::CDeviceTable sample( "sample.xml", "my_table" );
         Logger::Notice << "\n" << sample << std::endl;
     }
     catch( std::exception & e )

@@ -24,78 +24,32 @@
 
 #include "CDeviceTable.hpp"
 
+namespace freedm {
 namespace simserv {
 
-/// Creates an empty device table
 CDeviceTable::CDeviceTable()
 {
-    Logger::Debug << __PRETTY_FUNCTION__ << std::endl;
+    // skip
 }
 
-/// Creates a device table from the given specification file
-CDeviceTable::CDeviceTable( const std::string & p_xml,
-    const std::string & p_tag )
+CDeviceTable::CDeviceTable( const std::string &p_xml,
+        const std::string &p_tag )
 {
-    Logger::Debug << __PRETTY_FUNCTION__ << std::endl;
-    
     ReadFile( p_xml, p_tag );
 }
 
-/// Parses and stores the given specification file as a device table
 void CDeviceTable::ReadFile( const std::string & p_xml,
-    const std::string & p_tag )
+        const std::string & p_tag )
 {
-    Logger::Debug << __PRETTY_FUNCTION__ << std::endl;
-    
+    // redefine internal structure
     m_structure.ReadFile( p_xml, p_tag );
     
+    // reset data
     m_data.clear();
     m_data.resize(m_structure.GetTableSize());
-    ResetVector();
 }
 
-/// Sets the value of a device key for a given controller
-void CDeviceTable::SetValue( const CDeviceKey & p_dkey,
-    TSimulationValue p_value, size_t p_control )
-{
-    size_t index = m_structure.GetIndex(p_dkey);
-    
-    // check for write permission
-    if( m_structure.CheckAccess(p_dkey,p_control) == false )
-    {
-        throw std::domain_error("Private Table SetValue");
-    }
-    
-    // writer critical section
-    TWriteLock lock(m_mutex);
-    m_data[index] = p_value;
-}
-
-/// Returns the value of a device key for a given controller
-TSimulationValue CDeviceTable::GetValue( const CDeviceKey & p_dkey,
-    size_t p_control )
-{
-    size_t index = m_structure.GetIndex(p_dkey);
-    
-    // check for read permission
-    if( m_structure.CheckAccess(p_dkey,p_control) == false )
-    {
-        throw std::domain_error("Private Table GetValue");
-    }
-    
-    // reader critical section
-    TReadLock lock(m_mutex);
-    return m_data[index];
-}
-
-/// Resets the value of a device key to its initial value
-void CDeviceTable::ResetValue( const CDeviceKey & p_dkey, size_t p_control )
-{
-    SetValue( p_dkey, m_structure.GetInitialValue(p_dkey), p_control );
-}
-
-/// Sets the content of the device table to the given vector
-void CDeviceTable::SetVector( const std::vector<TSimulationValue> & p_vector )
+void CDeviceTable::SetData( std::vector<TValue> p_vector )
 {
     // check for data integrity
     if( p_vector.size() != m_data.size() )
@@ -105,37 +59,34 @@ void CDeviceTable::SetVector( const std::vector<TSimulationValue> & p_vector )
     
     // writer critical section
     TWriteLock lock(m_mutex);
-    m_data = p_vector;
+    m_data.swap(p_vector);
 }
 
-/// Returns the content of the device table as a vector
-std::vector<TSimulationValue> CDeviceTable::GetVector()
+void CDeviceTable::SetValue( const CDeviceKey & p_dkey, TValue p_value )
+{
+    size_t index = m_structure.GetIndex(p_dkey);
+    
+    // writer critical section
+    TWriteLock lock(m_mutex);
+    m_data[index] = p_value;
+}
+
+std::vector<CDeviceTable::TValue> CDeviceTable::GetData()
 {
     // reader critical section
     TReadLock lock(m_mutex);
     return m_data;
 }
 
-/// Resets all device keys to their initial values
-void CDeviceTable::ResetVector()
+CDeviceTable::TValue CDeviceTable::GetValue( const CDeviceKey & p_dkey )
 {
-    std::vector<TSimulationValue> initial_vector;
-    TSimulationValue value;
-    CDeviceKey dkey;
+    size_t index = m_structure.GetIndex(p_dkey);
     
-    // create a vector of initial values
-    for( size_t i = 0, n = m_data.size(); i < n; i++ )
-    {
-        dkey    = m_structure.GetDevice(i);
-        value   = m_structure.GetInitialValue(dkey);
-
-        initial_vector.push_back(value);
-    }
-    
-    SetVector(initial_vector);
+    // reader critical section
+    TReadLock lock(m_mutex);
+    return m_data[index];
 }
 
-/// Prints the device table to the given output stream
 std::ostream & CDeviceTable::PrintTable( std::ostream & p_os ) const
 {
     size_t n = m_data.size();
@@ -146,6 +97,7 @@ std::ostream & CDeviceTable::PrintTable( std::ostream & p_os ) const
         // print device key and value pair
         p_os << m_structure.GetDevice(i) << "\t" << m_data[i];
         
+        // next entry
         ++i;
         
         // print delimiter
@@ -158,10 +110,10 @@ std::ostream & CDeviceTable::PrintTable( std::ostream & p_os ) const
     return p_os;
 }
 
-/// Outputs a device table to the given output stream
 std::ostream & operator<<( std::ostream & p_os, const CDeviceTable & p_table )
 {
     return p_table.PrintTable(p_os);
 }
 
 } // namespace simserv
+} // namespace freedm

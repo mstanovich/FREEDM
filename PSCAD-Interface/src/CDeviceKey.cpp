@@ -24,46 +24,40 @@
 
 #include "CDeviceKey.hpp"
 
+namespace freedm {
 namespace simserv {
 
-/// Constructs an empty device key
 CDeviceKey::CDeviceKey()
 {
     // skip
 }
 
-/// Constructs a (device,key) pair from the given arguments
-CDeviceKey::CDeviceKey(const std::string & p_device, const std::string & p_key)
+CDeviceKey::CDeviceKey( const std::string &p_device, const std::string &p_key )
     : m_device(p_device), m_key(p_key)
 {
     // skip
 }
 
-/// Sets the physical device identifier
 void CDeviceKey::SetDevice( const std::string & p_device )
 {
     m_device = p_device;
 }
 
-/// Sets the simulation variable key
 void CDeviceKey::SetKey( const std::string & p_key )
 {
     m_key = p_key;
 }
 
-/// Gets the physical device identifier
 const std::string & CDeviceKey::GetDevice() const
 {
     return m_device;
 }
 
-/// Gets the simulation variable key
 const std::string & CDeviceKey::GetKey() const
 {
     return m_key;
 }
 
-/// Determines if the left device key is less than the right
 bool operator<( const CDeviceKey & p_lhs, const CDeviceKey & p_rhs )
 {
     const std::string & l_device    = p_lhs.GetDevice();
@@ -74,7 +68,6 @@ bool operator<( const CDeviceKey & p_lhs, const CDeviceKey & p_rhs )
     return( l_device < r_device || (l_device == r_device && l_key < r_key) );
 }
 
-/// Determines if two device keys are equivalent
 bool operator==( const CDeviceKey & p_lhs, const CDeviceKey & p_rhs )
 {
     const std::string & l_device    = p_lhs.GetDevice();
@@ -85,7 +78,6 @@ bool operator==( const CDeviceKey & p_lhs, const CDeviceKey & p_rhs )
     return( l_device == r_device && l_key == r_key );
 }
 
-/// Outputs a device key to the given otuput stream
 std::ostream & operator<<( std::ostream & p_os, const CDeviceKey & p_dkey )
 {
     const std::string & device  = p_dkey.GetDevice();
@@ -95,3 +87,4 @@ std::ostream & operator<<( std::ostream & p_os, const CDeviceKey & p_dkey )
 }
 
 } // namespace simserv
+} // namespace freedm

@@ -24,37 +24,27 @@
 
 #include "CTableStructure.hpp"
 
+namespace freedm {
 namespace simserv {
 
-/// Creates an empty table structure
 CTableStructure::CTableStructure()
 {
-    Logger::Debug << __PRETTY_FUNCTION__ << std::endl;
+    // skip
 }
 
-/// Creates a table structure defined by a tag in an xml file
 CTableStructure::CTableStructure( const std::string & p_xml,
-    const std::string & p_tag )
+        const std::string & p_tag )
 {
-    Logger::Debug << __PRETTY_FUNCTION__ << std::endl;
-    
     ReadFile( p_xml, p_tag );
 }
 
-/// Parses and stores the content of an xml file as the table structure
 void CTableStructure::ReadFile( const std::string & p_xml,
-    const std::string & p_tag )
+        const std::string & p_tag )
 {
     using boost::property_tree::ptree;
-    Logger::Debug << __PRETTY_FUNCTION__ << std::endl;
-    
+
     ptree xml_tree;
     
-    ptree::assoc_iterator access_it;
-    std::set<size_t> access_set;
-    size_t access_index;
-    
-    boost::optional<TSimulationValue> initial;
     std::string device, key;
     size_t index;
 
@@ -62,8 +52,8 @@ void CTableStructure::ReadFile( const std::string & p_xml,
     SEntry entry;
 
     // clear old data structures
-    m_IndexToDevice.clear();
-    m_DeviceToEntry.clear();
+    m_IndexToKey.clear();
+    m_KeyToEntry.clear();
     
     // create property tree
     read_xml( p_xml, xml_tree );
@@ -80,46 +70,10 @@ void CTableStructure::ReadFile( const std::string & p_xml,
     // iterate over each entry of the tagged subtree
     BOOST_FOREACH( ptree::value_type & child, xml_tree )
     {
-        // convenience reference
-        ptree & subtree = child.second;
-        
-        // reset access set
-        access_set.clear();
-        
         // read each entry attribute
-        index   = subtree.get<size_t>("<xmlattr>.index");
-        device  = subtree.get<std::string>("device");
-        key     = subtree.get<std::string>("key");
-        initial = subtree.get_optional<TSimulationValue>("initial");
-
-        // this should use equal_range - but I couldn't get it to work :(
-        access_it = subtree.find("access");
-        if( access_it == subtree.not_found() )
-        {
-            // set the default access level to global
-            for( size_t i = 0; i < m_ControlCount; i++ )
-            {
-                access_set.insert(i);
-            }
-        }
-        while( access_it != subtree.not_found() )
-        {
-            // get the index of the next controller with access
-            access_index = access_it->second.get_value<size_t>();
-            
-            // insert the index into the access set
-            if( access_set.count(access_index) > 0 )
-            {
-                throw std::logic_error("Duplicate Access Indexes");
-            }
-            access_set.insert(access_index);
-            
-            // erase the index so the next one can be selected
-            subtree.erase(subtree.to_iterator(access_it));
-            
-            // select the next access index
-            access_it = subtree.find("access");
-        }
+        index   = child.second.get<size_t>("<xmlattr>.index");
+        device  = child.second.get<std::string>("device");
+        key     = child.second.get<std::string>("key");
         
         // set the device key
         dkey.SetDevice(device);
@@ -128,110 +82,66 @@ void CTableStructure::ReadFile( const std::string & p_xml,
         // check for incorrect values
         if( index >= m_TableSize )
         {
-            throw std::logic_error("XML File has Invalid Indexes");
+            throw std::logic_error("XML has Invalid Indexes");
         }
-        if( m_IndexToDevice.count(index) > 0 )
+        if( m_IndexToKey.count(index) > 0 )
         {
-            throw std::logic_error("XML File has Duplicate Indexes");
+            throw std::logic_error("XML has Duplicate Indexes");
         }
-        if( m_DeviceToEntry.count(dkey) > 0 )
+        if( m_KeyToEntry.count(dkey) > 0 )
         {
-            throw std::logic_error("XML File has Duplicate Device Keys");
-        }
-        if( access_set.size() > 0 && (*access_set.rbegin()) >= m_ControlCount )
-        {
-            throw std::logic_error("XML File has Invalid Access Indexes");
+            throw std::logic_error("XML has Duplicate Device Keys");
         }
         
         // set the entry information
-        entry.s_TableIndex      = index;
-        entry.s_InitialValue    = ( initial ? initial.get() : 0 );
-        entry.s_ControlAccess   = access_set;
+        entry.s_TableIndex = index;
         
         // store the table entry
-        m_IndexToDevice.insert( TIndexToDevice::value_type(index,dkey) );
-        m_DeviceToEntry.insert( TDeviceToEntry::value_type(dkey,entry) );
+        m_IndexToKey.insert( TIndexToKey::value_type(index,dkey) );
+        m_KeyToEntry.insert( TKeyToEntry::value_type(dkey,entry) );
     }
 }
 
-/// Returns the number of stored device keys
 size_t CTableStructure::GetTableSize() const
 {
     return m_TableSize;
 }
 
-/// Returns the number of known controllers
 size_t CTableStructure::GetControlCount() const
 {
     return m_ControlCount;
 }
 
-/// Converts a table index into its stored device key
 const CDeviceKey & CTableStructure::GetDevice( size_t p_index ) const
 {
-    TIndexToDevice::const_iterator it = m_IndexToDevice.find(p_index);
+    TIndexToKey::const_iterator it = m_IndexToKey.find(p_index);
 
-    if( it == m_IndexToDevice.end() )
+    if( it == m_IndexToKey.end() )
     {
         throw std::range_error("Invalid Table Index");
     }
     return it->second;
 }
 
-/// Converts a device key into its table index
 size_t CTableStructure::GetIndex( const CDeviceKey & p_dkey ) const
 {
     return GetEntry(p_dkey).s_TableIndex;
 }
 
-/// Returns the initial value assigned to a device key
-TSimulationValue CTableStructure::GetInitialValue(
-    const CDeviceKey & p_dkey ) const
-{
-    return GetEntry(p_dkey).s_InitialValue;
-}
-
-/// Checks whether a controller has access to a device key
-bool CTableStructure::CheckAccess( const CDeviceKey & p_dkey,
-    size_t p_control ) const
-{
-    return( GetEntry(p_dkey).s_ControlAccess.count(p_control) > 0 );
-}
-
-/// Prints the table structure to the given output stream
 std::ostream & CTableStructure::PrintTable( std::ostream & p_os ) const
 {
-    TDeviceToEntry::const_iterator it   = m_DeviceToEntry.begin();
-    TDeviceToEntry::const_iterator end  = m_DeviceToEntry.end();
-    std::set<size_t>::const_iterator access_it, access_end;
+    TKeyToEntry::const_iterator it   = m_KeyToEntry.begin();
+    TKeyToEntry::const_iterator end  = m_KeyToEntry.end();
     
     while( it != end )
     {
-        // get access list iterators
-        access_it   = it->second.s_ControlAccess.begin();
-        access_end  = it->second.s_ControlAccess.end();
-
         // print device key
         p_os << it->first;
         
         // print entry information
         p_os << "[index=" << it->second.s_TableIndex << "]";
-        p_os << "[init_value=" << it->second.s_InitialValue << "]";
-        p_os << "[access=(";
-        while( access_it != access_end )
-        {
-            p_os << (*access_it);
-            
-            ++access_it;
-            
-            // print access delimiter
-            if( access_it != access_end )
-            {
-                p_os << ",";
-            }
-        }
-        p_os << ")]";
         
+        // next entry
         ++it;
         
         // print entry delimiter
@@ -244,23 +154,22 @@ std::ostream & CTableStructure::PrintTable( std::ostream & p_os ) const
     return p_os;
 }
 
-/// Returns the stored entry information for a device key
 const CTableStructure::SEntry & CTableStructure::GetEntry(
-    const CDeviceKey & p_dkey ) const
+        const CDeviceKey & p_dkey ) const
 {
-    TDeviceToEntry::const_iterator it = m_DeviceToEntry.find(p_dkey);
-
-    if( it == m_DeviceToEntry.end() )
+    TKeyToEntry::const_iterator it = m_KeyToEntry.find(p_dkey);
+    
+    if( it == m_KeyToEntry.end() )
     {
         throw std::range_error("Invalid Device Key");
     }
     return it->second;
 }
 
-/// Outputs a table structure to the given output stream
 std::ostream & operator<<( std::ostream & p_os, const CTableStructure & p_ts )
 {
     return p_ts.PrintTable(p_os);
 }
 
 } // namespace simserv
+} // namespace freedm

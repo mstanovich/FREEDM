@@ -36,69 +36,41 @@
 
 #include <boost/thread/shared_mutex.hpp>
 
-#include "common.hpp"
-#include "logger.hpp"
 #include "CDeviceKey.hpp"
 #include "CTableStructure.hpp"
 
-CREATE_EXTERN_STD_LOGS()
-
+namespace freedm {
 namespace simserv {
 
-/// Defines a table of device keys from an xml specification file
 class CDeviceTable
 {
 public:
-    /// Creates an empty device table
+    typedef double TValue;
+    
     CDeviceTable();
-    
-    /// Creates a device table from the given specification file
     CDeviceTable( const std::string & p_xml, const std::string & p_tag );
-    
-    /// Parses and stores the given specification file as a device table
     void ReadFile( const std::string & p_xml, const std::string & p_tag );
+
+    void SetData( std::vector<TValue> p_data );
+    void SetValue( const CDeviceKey & p_dkey, TValue p_value );
     
-    /// Sets the value of a device key for a given controller
-    void SetValue( const CDeviceKey & p_dkey, TSimulationValue p_value,
-        size_t p_control );
-    
-    /// Returns the value of a device key for a given controller
-    TSimulationValue GetValue( const CDeviceKey & p_dkey, size_t p_control );
-    
-    /// Resets the value of a device key to its initial value
-    void ResetValue( const CDeviceKey & p_dkey, size_t p_control );
-    
-    /// Sets the content of the device table to the given vector
-    void SetVector( const std::vector<TSimulationValue> & p_vector );
-    
-    /// Returns the content of the device table as a vector
-    std::vector<TSimulationValue> GetVector();
-    
-    /// Resets all device keys to their initial values
-    void ResetVector();
-    
-    /// Prints the device table to the given output stream
+    std::vector<TValue> GetData();
+    TValue GetValue( const CDeviceKey & p_dkey );
+
     std::ostream & PrintTable( std::ostream & p_os ) const;
 private:
-    /// Lock type for readers of m_mutex
-    typedef boost::shared_lock<boost::shared_mutex> TReadLock;
-    
-    /// Lock type for writers of m_mutex
     typedef boost::unique_lock<boost::shared_mutex> TWriteLock;
-    
-    /// Internal structure of the device table
-    CTableStructure m_structure;
-    
-    /// Read-Write mutex for m_data
+    typedef boost::shared_lock<boost::shared_mutex> TReadLock;
+
+    std::vector<TValue> m_data;
     boost::shared_mutex m_mutex;
     
-    /// Storage location for table elements
-    std::vector<TSimulationValue> m_data;
+    CTableStructure m_structure;
 };
 
-/// Outputs a device table to the given output stream
 std::ostream & operator<<( std::ostream & p_os, const CDeviceTable & p_table );
 
 } // namespace simserv
+} // namespace freedm
 
 #endif // C_DEVICE_TABLE_CPP

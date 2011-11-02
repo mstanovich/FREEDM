@@ -8,10 +8,6 @@ set (
     CDeviceKey.cpp
     CTableStructure.cpp
     CDeviceTable.cpp
-    CLineServer.cpp
-    IWorker.cpp
-    IWorkerInterface.cpp
-    CSimulationInterface.cpp
 )
 
 # set C++ compiler flags
