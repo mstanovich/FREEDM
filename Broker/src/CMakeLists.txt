@@ -16,10 +16,12 @@ set(
     sc/CStateCollection.cpp
     CDeviceStructureGeneric.cpp
     CDeviceStructurePSCAD.cpp
+    CDeviceStructureRTDS.cpp
     CDeviceFactory.cpp
     CDeviceLWI.cpp
     CDevice.cpp
     CLineClient.cpp
+    CClientRTDS.cpp
     )
 
 # set BROKER_VERSION macro : cp version.h.cmake version.h

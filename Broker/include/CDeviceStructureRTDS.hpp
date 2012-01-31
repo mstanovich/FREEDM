@@ -31,33 +31,35 @@
 #include <boost/lexical_cast.hpp>
 
 #include "IPhysicalDevice.hpp"
-#include "CLineClient.hpp"
+#include "CClientRTDS.hpp"
 
 namespace freedm {
 namespace broker {
 namespace device {
 
 
-/// PSCAD device with a line client to query device settings
+/// RTDS specific get and set
 class CDeviceStructureRTDS
     : public IDeviceStructure
 {
 public:
     /// constructor which takes a line client
-    CDeviceStructurePSCAD( CLineClient::TPointer client );
+    CDeviceStructureRTDS( CClientRTDS::RTDSPointer client );
     
-    /// Gets the setting of some key from the register
+    /// Gets the setting of some key from state table
     virtual SettingValue Get( const SettingKey & key );
     
-    /// Sets the value of some key in the register
+    /// Sets the value of some key in the command table
     virtual void Set( const SettingKey & key, const SettingValue & value );
+
+    //
 private:
     /// Simulation line client
-    CLineClient::TPointer m_client;
+    CClientRTDS::RTDSPointer m_client;
 };
 
 } // namespace device
 } // namespace broker
 } // namespace freedm
 
-#endif // C_DEVICE_STRUCTURE_PSCAD_HPP
+#endif // C_DEVICE_STRUCTURE_RTDS_HPP

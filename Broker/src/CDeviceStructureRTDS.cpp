@@ -32,11 +32,11 @@ namespace broker {
 namespace device {
 
 ///////////////////////////////////////////////////////////////////////////////
-/// @fn CDeviceStructurePSCAD
+/// @fn CDeviceStructureRTDS
 /// @brief constructor
-/// @param client The line client that connects to PSCAD interface
+/// @param client The client that connects to FPGA interface
 ///////////////////////////////////////////////////////////////////////////////
-CDeviceStructurePSCAD::CDeviceStructurePSCAD( CLineClient::TPointer client )
+CDeviceStructureRTDS::CDeviceStructureRTDS( CClientRTDS::RTDSPointer client )
     : m_client(client)
 {
     // skip
@@ -44,12 +44,13 @@ CDeviceStructurePSCAD::CDeviceStructurePSCAD( CLineClient::TPointer client )
 
 ///////////////////////////////////////////////////////////////////////////////
 /// @fn Get( const SettingKey & )
-/// @brief Returns the value of some key from readings from PSCAD
-/// @param key The key to retrieve from PSCAD
-/// @return The value from PSCAD
+/// @brief Returns the value of some key from readings from RTDS
+/// @param key The key to retrieve from RTDS
+/// @return The value from table
 ///////////////////////////////////////////////////////////////////////////////
-SettingValue CDeviceStructurePSCAD::Get( const SettingKey & key )
+SettingValue CDeviceStructureRTDS::Get( const SettingKey & key )
 {
+    
     std::string response = m_client->Get(GetDevice(), key);
     return boost::lexical_cast<double>(response);
 }
@@ -60,7 +61,7 @@ SettingValue CDeviceStructurePSCAD::Get( const SettingKey & key )
 /// @param key The key to change.
 /// @param value The value to set the key to.
 ///////////////////////////////////////////////////////////////////////////////
-void CDeviceStructurePSCAD::Set( const SettingKey & key, const SettingValue & value )
+void CDeviceStructureRTDS::Set( const SettingKey & key, const SettingValue & value )
 {
     std::string valueInString = boost::lexical_cast<std::string>(value);
     m_client->Set(GetDevice(), key, valueInString);

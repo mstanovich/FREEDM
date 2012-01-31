@@ -32,8 +32,8 @@
 ///
 ////////////////////////////////////////////////////////////////////////////////
 
-#ifndef C_LINE_CLIENT
-#define C_LINE_CLIENT
+#ifndef C_CLIENT_RTDS_HPP
+#define C_CLIENT_RTDS_HPP
 
 #include <string>
 #include <iostream>
@@ -42,17 +42,21 @@
 #include <boost/asio.hpp>
 #include <boost/utility.hpp>
 #include <boost/shared_ptr.hpp>
+#include <boost/thread/mutex.hpp>
+#include <boost/thread/thread.hpp>
+
+#include "logger.hpp" 
 
 namespace freedm{
   namespace broker{
-/// Provides an interface for communicating commands to a PSCAD model
-class CLineClient : private boost::noncopyable
+/// Provides an interface for communicating with a RTDS model
+class CClientRTDS : private boost::noncopyable
 {
     ////////////////////////////////////////////////////////////////////////////////
-    /// CLineClient
+    /// CClientRTDS
     ///
     /// @description
-    ///     Client side of a line protocol with three requests: GET, SET and QUIT.
+    ///     The connection point with FPGA.  Acts as a client to FPGA's server.
     ///     The GET and SET commands operate on (Device,Key) pairs, where Device is
     ///     the unique identifier of some physical hardware and Key is the variable
     ///     name of that hardware to be manipulated.
@@ -62,14 +66,15 @@ class CLineClient : private boost::noncopyable
     ///
     ////////////////////////////////////////////////////////////////////////////////
 public:
-    typedef boost::shared_ptr<CLineClient> TPointer;
-    static TPointer Create( boost::asio::io_service & p_service );
+    typedef boost::shared_ptr<CClientRTDS> RTDSPointer;
+    static RTDSPointer Create( boost::asio::io_service & p_service, std::string p_configFile );
     
     ////////////////////////////////////////////////////////////////////////////
     /// Connect( const string &, const string & )
     ///
     /// @description
     ///     Creates a socket connection to the given hostname and service.
+    ///     Is called by DeviceFactory when DeviceFactory is created.
     ///
     /// @Shared_Memory
     ///     none
@@ -96,12 +101,20 @@ public:
     ///
     ////////////////////////////////////////////////////////////////////////////
     bool Connect( const std::string p_hostname, const std::string p_port );
-    
+  
+    /////////////////////////////////////////////////////////////////////////
+    /// Run
+    /// @description
+    ///      This is the main communication engine.
+    ///      At every time step, initiate a send and receive of message to FPGA.
+    //////////////////////////////////////////////////////////////////////////
+    void Run();
+
     ////////////////////////////////////////////////////////////////////////////
     /// Set( const string &, const string &, const string & )
     ///
     /// @description
-    ///     Sends a set request to the line server with a desired set value.
+    ///     Search the cmdTable and then update the cmdBuf.
     ///
     /// @Shared_Memory
     ///     none
@@ -131,7 +144,7 @@ public:
     /// Get( const string &, const string & )
     ///
     /// @description
-    ///     Sends a get request to the line server and returns the response.
+    ///     Search the stateTable and read from it.
     ///
     /// @Shared_Memory
     ///     none
@@ -186,7 +199,7 @@ public:
     void Quit();
     
     ////////////////////////////////////////////////////////////////////////////
-    /// ~CLineClient
+    /// ~CLineRTDS
     ///
     /// @description
     ///     Closes the socket before destroying an object instance.
@@ -207,13 +220,13 @@ public:
     ///     none
     ///
     ////////////////////////////////////////////////////////////////////////////    
-    ~CLineClient();
+    ~CClientRTDS();
 private:
     ////////////////////////////////////////////////////////////////////////////
-    /// CLineClient( io_service & )
+    /// CClientRTDS( io_service & )
     ///
     /// @description
-    ///     Creates a line protocol client on the given service.
+    ///     Creates a RTDS client on the given service.
     ///
     /// @Shared_Memory
     ///     Uses the passed io_service until destroyed.
@@ -234,13 +247,32 @@ private:
     ///     none
     ///
     ////////////////////////////////////////////////////////////////////////////
-    CLineClient( boost::asio::io_service & p_service );
+    CClientRTDS( boost::asio::io_service & p_service, std::string p_configFile );
     
-    /// socket to line protocol server
+    void endian_swap(char * data, const int num_bytes);
+
+    /// socket to connect to FPGA server
     boost::asio::ip::tcp::socket m_socket;
+
+    /// name of the FPGA configuaration file
+    std::string m_fileName;
+
+    //store the readings from RTDS as well as commands to send to RTDS
+    CTableRTDS m_cmdTable;
+
+    CTableRTDS m_stateTable;
+
+    int rx_size;
+    int tx_size;
+
+    //buffer for reading and writing to FPGA, 64 bytes (maximum)
+    char rxBuffer[64];  
+    char txBuffer[64];
+
+    boost::asio::deadline_timer m_GlobalTimer;
 };
 
   }//namespace broker
 }//namespace freedm
 
-#endif // C_LINE_CLIENT
+#endif // C_CLIENT_RTDS_HPP
