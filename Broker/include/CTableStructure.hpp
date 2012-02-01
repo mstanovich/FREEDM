@@ -53,13 +53,14 @@
 CREATE_EXTERN_STD_LOGS()
 
 namespace freedm {
-
+    namespace broker {
 ////////////////////////////////////////////////////////////////////////////////
 /// CTableStructure
 ///
 /// @description
 /// The table structure class maintains an internal state that can be
-/// accessed or modified by device key. Its internal structure is defined
+/// accessed or modified by a device-key pair, which are bundled into one
+/// object called CDeviceKeyCoupled. Its internal structure is defined
 /// by the XML file used to create the class instance.
 ///
 /// @limitations
@@ -91,18 +92,16 @@ public:
     ///
     /// @param
     /// p_xml is the filename of the XML Input file
-    /// p_tag is the XML tag of the table specification
+    /// p_tag is the XML tag of the table specification, eithre <command> or <state>.
     ///
     /// @limitations
     /// Required XML Format:
     /// <root>
-    /// <SSTCount>Number of SST</SSTCount>
     /// ...
     /// <p_tag>
     /// <entry index="1">
     /// <device>Unique Device Identifier</device>
     /// <key>Device Variable(such as power)</key>
-    /// <parent>Parent SST(optional, index from 1)</parent>
     /// </entry>
     /// ...
     /// <entry index="n">
@@ -118,7 +117,7 @@ public:
     /// GetSize() const
     ///
     /// @description
-    /// Returns the number of unique device keys stored in the table.
+    /// Returns the number of unique device-keys stored in the table.
     ///
     /// @Shared_Memory
     /// none
@@ -145,7 +144,7 @@ public:
     /// FindIndex( const CDeviceKeyCoupled & ) const
     ///
     /// @description
-    /// Converts a device key to a numeric index.
+    /// Converts a device-key object to a numeric index.
     ///
     /// @Shared_Memory
     /// none
@@ -160,7 +159,7 @@ public:
     /// none
     ///
     /// @param
-    /// p_dkey is the device key to convert into an index
+    /// p_dkey is the device-key combo object to convert into an index
     ///
     /// @return
     /// index corresponding to p_dkey
@@ -183,7 +182,7 @@ private:
     /// bidirectional map from CDeviceKeyCopled object to numeric index
     TBimap m_TableHeaders;
 };
-
+    }//namespace broker
 } // namespace freedm
 
 #endif // C_TABLE_STRUCTURE_HPP

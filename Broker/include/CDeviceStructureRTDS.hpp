@@ -38,12 +38,12 @@ namespace broker {
 namespace device {
 
 
-/// RTDS specific get and set
+/// this class will provide RTDS specific get and set functions
 class CDeviceStructureRTDS
     : public IDeviceStructure
 {
 public:
-    /// constructor which takes a line client
+    /// constructor which takes a RTDS client
     CDeviceStructureRTDS( CClientRTDS::RTDSPointer client );
     
     /// Gets the setting of some key from state table
@@ -54,7 +54,7 @@ public:
 
     //
 private:
-    /// Simulation line client
+    /// Simulation RTDS client
     CClientRTDS::RTDSPointer m_client;
 };
 

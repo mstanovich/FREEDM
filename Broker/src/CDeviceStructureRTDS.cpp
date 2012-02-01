@@ -8,7 +8,7 @@
 ///
 /// @project        FREEDM DGI
 ///
-/// @description    PSCAD physical device driver
+/// @description    RTDS physical device driver
 ///
 /// @license
 /// These source code files were created at the Missouri University of Science
@@ -44,7 +44,7 @@ CDeviceStructureRTDS::CDeviceStructureRTDS( CClientRTDS::RTDSPointer client )
 
 ///////////////////////////////////////////////////////////////////////////////
 /// @fn Get( const SettingKey & )
-/// @brief Returns the value of some key from readings from RTDS
+/// @brief Returns the value of some key from readings from state table
 /// @param key The key to retrieve from RTDS
 /// @return The value from table
 ///////////////////////////////////////////////////////////////////////////////
@@ -57,7 +57,7 @@ SettingValue CDeviceStructureRTDS::Get( const SettingKey & key )
 
 ///////////////////////////////////////////////////////////////////////////////
 /// @fn Set( const SettingKey &, const SettingValue & )
-/// @brief Sets the value of some key to to a new value and send to PSCAD
+/// @brief Sets the value of some key to a new value in the command table 
 /// @param key The key to change.
 /// @param value The value to set the key to.
 ///////////////////////////////////////////////////////////////////////////////

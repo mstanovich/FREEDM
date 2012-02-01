@@ -12,11 +12,12 @@
 ///     Client side implementation of the simulation line protocol.
 ///
 /// @functions
-///     CLineClient::Create( io_service & )
-///     CLineClient::Connect( const string &, const string & )
-///     CLineClient::Set( const string &, const string &, const string & )
-///     CLineClient::Get( const string &, const string & )
-///     CLineClient::Quit()
+///     CClientRTDS::Create( io_service &, const string &)
+///     CClientRTDS::Connect( const string &, const string & )
+///     CClientRTDS::Set( const string &, const string &, const string & )
+///     CClientRTDS::Get( const string &, const string & )
+///     CClientRTDS::Run()
+///     CClientRTDS::Quit()
 ///
 /// These source code files were created at the Missouri University of Science
 /// and Technology, and are intended for use in teaching or research. They may
@@ -108,7 +109,7 @@ public:
     /// Set( const string &, const string &, const string & )
     ///
     /// @description
-    ///     Search the cmdTable and then update the cmdBuf.
+    ///     Search the cmdTable and then update the specified value.
     ///
     /// @Shared_Memory
     ///     none
@@ -119,17 +120,15 @@ public:
     /// @pre
     ///     The socket connection has been established with a call to Connect
     ///
-    /// @post
-    ///     Writes a set message to m_socket
-    ///     Reads an acknowledgement from m_socket
-    ///
     /// @param
     ///     p_device is the unique identifier of the target device
     ///     p_key is the variable of the target device to modify
     ///     p_value is the value to set for p_device's p_key
     ///
     /// @limitations
-    ///     The precondition is not enforced.
+    ///     RTDS uses floats.  So p_value is type-cast into float during the 
+    ///     the execution of the function.  There could be minor loss of accuracy.
+    ///
     ///
     ////////////////////////////////////////////////////////////////////////////
     void Set( const std::string p_device, const std::string p_key, const double p_value );
@@ -149,19 +148,16 @@ public:
     /// @pre
     ///     The socket connection has been established with a call to Connect
     ///
-    /// @post
-    ///     Writes a get message to m_socket
-    ///     Reads a response from m_socket
-    ///
     /// @param
     ///     p_device is the unique identifier of the target device
     ///     p_key is the variable of the target device to access
     ///
     /// @return
-    ///     p_device's p_key as determined by the line server response
+    ///     value from table is retrieved
     ///
     /// @limitations
-    ///     The precondition is not enforced.
+    ///     RTDS uses floats.  So the return value is type-cast into double during the 
+    ///     the execution of the function. So accuracy is not as high as a real double.
     ///
     ////////////////////////////////////////////////////////////////////////////
     double Get( const std::string p_device, const std::string p_key );
@@ -182,8 +178,6 @@ public:
     ///     The socket connection has been established with a call to Connect
     ///
     /// @post
-    ///     Writes a quit message to m_socket
-    ///     Reads an acknowledgement from m_socket
     ///     Closes m_socket if no exception occurs
     ///
     /// @limitations
@@ -247,21 +241,55 @@ private:
     /////////////////////////////////////////////////////////////////////////
     /// Run
     /// @description
-    ///      This is the main communication engine.
-    ///      At every time step, initiate a send and receive of message to FPGA.
+    ///      This is the main communication handler.
+    ///      At every time step, initiate and send a message to FPGA, then 
+    ///      receive a message from FPGA.
+    ///
+    /// @Shared_Memory
+    ///     Uses the passed io_service until destroyed.
+    ///     Runs on its own thread
+    ///  
+    /// @Error_Handling
+    ///     none
+    ///
+    /// @pre
+    ///     Connection with FPGA is established.
+    ///
+    /// @post
+    ///     All values in the cmdTable is written to a buffer and send to 
+    ///     FPGA.  
+    ///     All values in the stateTable is rewritten with value received
+    ///     from FPGA.
+    ///
+    /// @param
+    ///
+    /// @limitations
+    ///     none
     //////////////////////////////////////////////////////////////////////////
     void Run();
 
+    ////////////////////////////////////////////////////////////////////////////////
+    /// endian_swap
+    ///
+    /// @description
+    ///     a utility function for converting byte order from big endian to little 
+    ///     endian and vise versa.
+    ///
+    /// @limitations
+    ///     none
+    ///
+    ////////////////////////////////////////////////////////////////////////////////
     void endian_swap(char * data, const int num_bytes);
 
     /// socket to connect to FPGA server
     boost::asio::ip::tcp::socket m_socket;
 
-    //store the readings from RTDS as well as commands to send to RTDS
+    //store the readings from RTDS
     CTableRTDS m_cmdTable;
-
+    //store the commands to send to RTDS
     CTableRTDS m_stateTable;
 
+    //timer object to set send/receive cycle pace
     boost::asio::deadline_timer m_GlobalTimer;
 };
 

@@ -37,7 +37,7 @@
 #include <fstream>
 
 namespace freedm {
-
+    namespace broker {
 class CDeviceKeyCoupled;
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -122,7 +122,7 @@ public:
     /// CDeviceKeyCoupled( const string &, const string & )
     ///
     /// @description
-    /// Creates an instance of a device key.
+    /// Creates an instance of a device-key combo object.
     ///
     /// @Shared_Memory
     /// none
@@ -155,7 +155,7 @@ private:
     /// variable of interest
     std::string m_key;
 };
-
+    }//namespace broker
 } // namespace freedm
 
-#endif // C_DEVICE_KEY_HPP
+#endif // C_DEVICE_KEY_COUPLED_HPP

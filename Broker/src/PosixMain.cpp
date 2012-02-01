@@ -96,7 +96,7 @@ int main (int argc, char* argv[])
     po::variables_map vm_;
     std::ifstream ifs_;
     std::string cfgFile_, listenIP_, port_, uuid_, hostname_,uuidgenerator;
-    // Line Client options
+    // Line/RTDS Client options
     std::string interHost;
     std::string interPort;
     std::string xml;
@@ -125,10 +125,10 @@ int main (int argc, char* argv[])
              default_value("1870"), "TCP port to listen on")
             ("add-device,d", po::value<std::vector<std::string> >()->
             composing(), "physical device name:type pair")
-            ("lineclient-host,l", po::value<std::string>(&interHost)->
-             default_value(""),"Hostname to use for the lineclient to connect.")
-            ("lineclient-port,q", po::value<std::string>(&interPort)->
-             default_value("4001"),"The port to use for the lineclient to connect.")
+            ("client-host,l", po::value<std::string>(&interHost)->
+             default_value(""),"Hostname to use for the lineclient/RTDSclient to connect.")
+            ("client-port,q", po::value<std::string>(&interPort)->
+             default_value("4001"),"The port to use for the lineclient/RTDSclient to connect.")
             ("xml,x", po::value<std::string>(&xml)->default_value("FPGA.xml"),
                 "filename of FPGA message specification")
             ("verbose,v", po::value<int>(&verbose_)->

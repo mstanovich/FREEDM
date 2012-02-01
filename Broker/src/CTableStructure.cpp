@@ -27,7 +27,7 @@
 #include "CTableStructure.hpp"
 
 namespace freedm {
-
+    namespace broker {
 CTableStructure::CTableStructure( const std::string & p_xml, const std::string & p_tag )
 {
     using boost::property_tree::ptree;
@@ -84,5 +84,5 @@ size_t CTableStructure::FindIndex( const CDeviceKeyCoupled & p_dkey ) const
     // search by device for the requested p_dkey
     return( m_TableHeaders.by<SDevice>().at(p_dkey) );
 }
-
+    }//namespace broker
 } // namespace freedm

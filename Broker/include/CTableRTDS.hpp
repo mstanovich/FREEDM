@@ -54,7 +54,7 @@ class CClientRTDS;
 /// CTableRTDS
 ///
 /// @description
-/// The device table class stores a set of data indexed by device and key info. Its
+/// The table class stores a set of data indexed by device-key combo object. Its
 /// internal structure is defined by an XML file passed to the constructor.
 ///
 /// @limitations
@@ -98,7 +98,7 @@ public:
     /// SetValue( const CDeviceKeyCoupled &, size_t, double )
     ///
     /// @description
-    /// Modifies the table entry that corresponds to the given device key.
+    /// Modifies the table entry that corresponds to the given device-key object.
     ///
     /// @Shared_Memory
     /// m_data can be modified outside of the class
@@ -195,7 +195,7 @@ private:
     /// read-write mutex for m_data
     boost::shared_mutex m_mutex;
     
-    /// stored device variables. Notice this is in float type
+    /// actual values. Notice this is in float type
     float * m_data;
     
     /// number of m_data elements

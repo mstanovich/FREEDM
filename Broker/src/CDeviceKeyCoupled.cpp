@@ -27,7 +27,7 @@
 #include "CDeviceKeyCoupled.hpp"
 
 namespace freedm {
-
+    namespace broker {
 bool operator<( const CDeviceKeyCoupled & p_lhs, const CDeviceKeyCoupled & p_rhs )
 {
     return( p_lhs.m_device < p_rhs.m_device
@@ -44,5 +44,5 @@ CDeviceKeyCoupled::CDeviceKeyCoupled( const std::string & p_device, const std::s
 {
     // skip
 }
-
+    }//namespace broker
 } // namespace freedm

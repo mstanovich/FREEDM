@@ -80,11 +80,12 @@ void CClientRTDS::Run()
     //Start the timer; on timeout, this function is called again
     m_GlobalTimer.expires_from_now( boost::posix_time::microseconds(TIMESTEP) );
 
-    //how many values are in each table
+    //how many values are in the stateTable that stores readings from RTDS
     int rx_count = m_stateTable.m_length;
+    //how many values are in the cmdTable that stores orders to RTDS
     int tx_count = m_cmdTable.m_length;
             
-    //each value takes 4 bytes
+    //each value is type float (4 bytes)
     int rx_bufSize = 4*rx_count; 
     int tx_bufSize = 4*tx_count;
 
@@ -96,13 +97,13 @@ void CClientRTDS::Run()
     boost::shared_lock<boost::shared_mutex> lockRead(m_cmdTable.m_mutex);
     Logger::Debug << "Client_RTDS - obtained mutex as reader" << std::endl;   
     
-    //read from table
+    //read from cmdTable
     memcpy(tx_buffer, m_cmdTable.m_data, tx_bufSize);
     Logger::Debug << "Client_RTDS - released reader mutex" << std::endl;
     
     // FPGA will send values in big-endian byte order
     // If host machine is in little-endian byte order, convert to big-endian
-            #if __BYTE_ORDER == __LITTLE_ENDIAN
+#if __BYTE_ORDER == __LITTLE_ENDIAN
     for(int i=0; i<tx_count; i++) {
         endian_swap((char *)&tx_buffer[4*i], sizeof(float)); //should be 4 bytes in float.  
     }
@@ -124,7 +125,7 @@ void CClientRTDS::Run()
     
     boost::unique_lock<boost::shared_mutex> lockWrite(m_stateTable.m_mutex);
     Logger::Debug << "Client_RTDS - obtained mutex as writer" << std::endl;
-    //write to table    
+    //write to stateTable    
     memcpy(m_stateTable.m_data, rx_buffer, rx_bufSize);
     Logger::Debug << "Client_RTDS - released writer mutex" << std::endl;
         
