@@ -99,6 +99,7 @@ int main (int argc, char* argv[])
     // Line Client options
     std::string interHost;
     std::string interPort;
+    std::string xml;
     int verbose_;
     bool cliVerbose_(false); // CLI options override verbosity
     uuid u_;
@@ -128,6 +129,8 @@ int main (int argc, char* argv[])
              default_value(""),"Hostname to use for the lineclient to connect.")
             ("lineclient-port,q", po::value<std::string>(&interPort)->
              default_value("4001"),"The port to use for the lineclient to connect.")
+            ("xml,x", po::value<std::string>(&xml)->default_value("FPGA.xml"),
+                "filename of FPGA message specification")
             ("verbose,v", po::value<int>(&verbose_)->
              implicit_value(5)->default_value(3),
              "enable verbose output (optionally specify level)");
@@ -257,8 +260,9 @@ int main (int argc, char* argv[])
         // create the device factory
         // interHost is the hostname of the machine that runs the simulation
         // interPort is the port number this DGI and simulation communicate in
+        // xml is the name of the configuration file supplied from FPGA
         broker::device::CDeviceFactory factory(
-            m_phyManager, m_ios, interHost, interPort );
+                                               m_phyManager, m_ios, interHost, interPort, xml );
         
         // Create Devices
         if (vm_.count("add-device") > 0) 

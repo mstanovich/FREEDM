@@ -51,8 +51,8 @@ CDeviceStructureRTDS::CDeviceStructureRTDS( CClientRTDS::RTDSPointer client )
 SettingValue CDeviceStructureRTDS::Get( const SettingKey & key )
 {
     
-    std::string response = m_client->Get(GetDevice(), key);
-    return boost::lexical_cast<double>(response);
+    return m_client->Get(GetDevice(), key);
+    
 }
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -63,8 +63,7 @@ SettingValue CDeviceStructureRTDS::Get( const SettingKey & key )
 ///////////////////////////////////////////////////////////////////////////////
 void CDeviceStructureRTDS::Set( const SettingKey & key, const SettingValue & value )
 {
-    std::string valueInString = boost::lexical_cast<std::string>(value);
-    m_client->Set(GetDevice(), key, valueInString);
+    m_client->Set(GetDevice(), key, value);
 }
 
 } // namespace device

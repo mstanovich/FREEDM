@@ -27,7 +27,7 @@
 #include "CTableRTDS.hpp"
 
 namespace freedm {
-namespace simulation {
+    namespace broker{
 
 CTableRTDS::CTableRTDS( const std::string & p_xml, const std::string & p_tag )
     : m_structure( p_xml, p_tag )
@@ -35,7 +35,7 @@ CTableRTDS::CTableRTDS( const std::string & p_xml, const std::string & p_tag )
     Logger::Info << __PRETTY_FUNCTION__ << std::endl;
     
     m_length = m_structure.GetSize();
-    m_data = new double[m_length];
+    m_data = new float[m_length];
 
     for( size_t i = 0; i < m_length; i++ )
     {
@@ -53,7 +53,8 @@ double CTableRTDS::GetValue( const CDeviceKeyCoupled & p_dkey)
     Logger::Debug << " obtained mutex as reader" << std::endl;
     
     // convert the key to an index and return its value
-    return m_data[m_structure.FindIndex(p_dkey)];
+    float value = m_data[m_structure.FindIndex(p_dkey)];
+    return boost::lexical_cast<double>(value);
 }
 
 void CTableRTDS::SetValue( const CDeviceKeyCoupled & p_dkey, double p_value )
@@ -66,7 +67,8 @@ void CTableRTDS::SetValue( const CDeviceKeyCoupled & p_dkey, double p_value )
     Logger::Debug << " obtained mutex as writer" << std::endl;
     
     // convert the key to an index and set its value
-    m_data[m_structure.FindIndex(p_dkey)] = p_value;
+    float value = boost::lexical_cast<float>(p_value);
+    m_data[m_structure.FindIndex(p_dkey)] = value;
 }
 
 CTableRTDS::~CTableRTDS()
@@ -74,6 +76,5 @@ CTableRTDS::~CTableRTDS()
     Logger::Info << __PRETTY_FUNCTION__ << std::endl;
     delete [] m_data;
 }
-
-} // namespace simulation
+    }
 } // namespace freedm

@@ -31,6 +31,7 @@
 #include <boost/asio/io_service.hpp>
 
 #include "CLineClient.hpp"
+#include "CClientRTDS.hpp"
 #include "IPhysicalDevice.hpp"
 #include "PhysicalDeviceTypes.hpp"
 #include "CPhysicalDeviceManager.hpp"
@@ -50,7 +51,7 @@ public:
     /// Creates an instance of a device factory
     CDeviceFactory( CPhysicalDeviceManager & manager,
         boost::asio::io_service & ios, const std::string & host,
-        const std::string & port );
+                    const std::string & port, const std::string xml );
     
     /// Creates a device with the given identifier
     template <class DeviceType>

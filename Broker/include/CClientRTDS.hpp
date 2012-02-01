@@ -1,7 +1,8 @@
 ////////////////////////////////////////////////////////////////////////////////
 /// @file           CClientRTDS.hpp
 ///
-/// @author         Thomas Roth <tprfh7@mst.edu>
+/// @author         Yaxi Liu <ylztf@mst.edu>
+///                 Thomas Roth <tprfh7@mst.edu>
 ///
 /// @compiler       C++
 ///
@@ -46,6 +47,7 @@
 #include <boost/thread/thread.hpp>
 
 #include "logger.hpp" 
+#include "CTableRTDS.hpp"
 
 namespace freedm{
   namespace broker{
@@ -67,7 +69,7 @@ class CClientRTDS : private boost::noncopyable
     ////////////////////////////////////////////////////////////////////////////////
 public:
     typedef boost::shared_ptr<CClientRTDS> RTDSPointer;
-    static RTDSPointer Create( boost::asio::io_service & p_service, std::string p_configFile );
+    static RTDSPointer Create( boost::asio::io_service & p_service, const std::string p_xml );
     
     ////////////////////////////////////////////////////////////////////////////
     /// Connect( const string &, const string & )
@@ -102,14 +104,6 @@ public:
     ////////////////////////////////////////////////////////////////////////////
     bool Connect( const std::string p_hostname, const std::string p_port );
   
-    /////////////////////////////////////////////////////////////////////////
-    /// Run
-    /// @description
-    ///      This is the main communication engine.
-    ///      At every time step, initiate a send and receive of message to FPGA.
-    //////////////////////////////////////////////////////////////////////////
-    void Run();
-
     ////////////////////////////////////////////////////////////////////////////
     /// Set( const string &, const string &, const string & )
     ///
@@ -138,7 +132,7 @@ public:
     ///     The precondition is not enforced.
     ///
     ////////////////////////////////////////////////////////////////////////////
-    void Set( const std::string p_device, const std::string p_key, const std::string p_value );
+    void Set( const std::string p_device, const std::string p_key, const double p_value );
     
     ////////////////////////////////////////////////////////////////////////////
     /// Get( const string &, const string & )
@@ -170,7 +164,7 @@ public:
     ///     The precondition is not enforced.
     ///
     ////////////////////////////////////////////////////////////////////////////
-    std::string Get( const std::string p_device, const std::string p_key );
+    double Get( const std::string p_device, const std::string p_key );
     
     ////////////////////////////////////////////////////////////////////////////
     /// Quit
@@ -221,6 +215,7 @@ public:
     ///
     ////////////////////////////////////////////////////////////////////////////    
     ~CClientRTDS();
+
 private:
     ////////////////////////////////////////////////////////////////////////////
     /// CClientRTDS( io_service & )
@@ -247,27 +242,25 @@ private:
     ///     none
     ///
     ////////////////////////////////////////////////////////////////////////////
-    CClientRTDS( boost::asio::io_service & p_service, std::string p_configFile );
+    CClientRTDS( boost::asio::io_service & p_service, const std::string p_xml );
     
+    /////////////////////////////////////////////////////////////////////////
+    /// Run
+    /// @description
+    ///      This is the main communication engine.
+    ///      At every time step, initiate a send and receive of message to FPGA.
+    //////////////////////////////////////////////////////////////////////////
+    void Run();
+
     void endian_swap(char * data, const int num_bytes);
 
     /// socket to connect to FPGA server
     boost::asio::ip::tcp::socket m_socket;
 
-    /// name of the FPGA configuaration file
-    std::string m_fileName;
-
     //store the readings from RTDS as well as commands to send to RTDS
     CTableRTDS m_cmdTable;
 
     CTableRTDS m_stateTable;
-
-    int rx_size;
-    int tx_size;
-
-    //buffer for reading and writing to FPGA, 64 bytes (maximum)
-    char rxBuffer[64];  
-    char txBuffer[64];
 
     boost::asio::deadline_timer m_GlobalTimer;
 };

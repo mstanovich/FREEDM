@@ -34,13 +34,15 @@ namespace device {
 /// Creates an instance of a device factory
 CDeviceFactory::CDeviceFactory( CPhysicalDeviceManager & manager,
     boost::asio::io_service & ios, const std::string & host,
-    const std::string & port )
+                                const std::string & port, const std::string xml )
     : m_manager(manager)
-    , m_client(CLineClient::Create(ios))
 {
 #if defined USE_DEVICE_PSCAD
-    // connect to the simulation server
+    m_client(CLineClient::Create(ios));
     m_client->Connect(host,port);
+#elif defined USE_DEVICE_RTDS
+    m_client(CClientRTDS::Create(ios, xml));
+    m_client->connect(host,port);
 #endif
 }
 
@@ -49,6 +51,8 @@ IDeviceStructure::DevicePtr CDeviceFactory::CreateStructure()
 {
 #if defined USE_DEVICE_PSCAD
     return IDeviceStructure::DevicePtr( new CDeviceStructurePSCAD(m_client) );
+#elif defined USE_DEVICE_RTDS
+    return IDeviceStructure::DevicePtr( new CDeviceStructureRTDS(m_client) );
 #else
     return IDeviceStructure::DevicePtr( new CDeviceStructureGeneric() );
 #endif

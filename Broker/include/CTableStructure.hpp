@@ -48,12 +48,11 @@
 #include <boost/property_tree/xml_parser.hpp>
 
 #include "logger.hpp"
-#include "CDeviceKey.hpp"
+#include "CDeviceKeyCoupled.hpp"
 
 CREATE_EXTERN_STD_LOGS()
 
 namespace freedm {
-namespace simulation {
 
 ////////////////////////////////////////////////////////////////////////////////
 /// CTableStructure
@@ -185,7 +184,6 @@ private:
     TBimap m_TableHeaders;
 };
 
-} // namespace simulation
 } // namespace freedm
 
 #endif // C_TABLE_STRUCTURE_HPP

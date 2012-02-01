@@ -1,7 +1,8 @@
 ////////////////////////////////////////////////////////////////////////////////
 /// @file           CClientRTDS.cpp
 ///
-/// @author         Thomas Roth <tprfh7@mst.edu>
+/// @author         Yaxi Liu <ylztf@mst.edu>
+///                 Thomas Roth <tprfh7@mst.edu>
 ///
 /// @compiler       C++
 ///
@@ -38,19 +39,15 @@
 namespace freedm{
   namespace broker{
 
-      CClientRTDS::RTDSPointer CClientRTDS::Create( boost::asio::io_service & p_service, std::string p_configFile )
+CClientRTDS::RTDSPointer CClientRTDS::Create( boost::asio::io_service & p_service, const std::string p_xml )
 {
-    return CClientRTDS::RTDSPointer( new CClientRTDS(p_service, p_configFile) );
+    return CClientRTDS::RTDSPointer( new CClientRTDS(p_service, p_xml) );
 }
 
-      CClientRTDS::CClientRTDS( boost::asio::io_service & p_service, std::string p_configFile )
-          : m_socket(p_service), m_fileName(p_configFile), m_GlobalTimer(p_service)
+CClientRTDS::CClientRTDS( boost::asio::io_service & p_service, const std::string p_xml )
+    : m_socket(p_service), m_GlobalTimer(p_service), m_cmdTable(p_xml, "command"), m_stateTable(p_xml, "state")
 {
-     //get buffer sizes by reading the FPGA configuration file
-    rx_size = 0 ;  //random right now
-    tx_size = 0 ;
-
-    // using the configuaration file to construct the two tables
+  
 }
 
       //FPGA's hostname and port number resolved and passed in by PosixMain
@@ -75,66 +72,82 @@ bool CClientRTDS::Connect( const std::string p_hostname, const std::string p_por
     }
     
     return( it != end );
+    boost::thread thread2(&CClientRTDS::Run, this);
 }
 
 void CClientRTDS::Run() 
 {   
-            //Always send data to FPGA first
-            boost::shared_lock<boost::shared_mutex> lock(m_cmdData.m_mutex);
-            Logger::Debug << "Client_RTDS - obtained mutex as reader" << std::endl;   
+    //Start the timer; on timeout, this function is called again
+    m_GlobalTimer.expires_from_now( boost::posix_time::microseconds(TIMESTEP) );
+
+    //how many values are in each table
+    int rx_count = m_stateTable.m_length;
+    int tx_count = m_cmdTable.m_length;
             
-            memcpy(txBuffer, m_cmdData, tx_size);
-            boost::shared_lock<boost::shared_mutex> unlock(m_cmdData.m_mutex);
-            Logger::Debug << "Client_RTDS - released reader mutex" << std::endl;
+    //each value takes 4 bytes
+    int rx_bufSize = 4*rx_count; 
+    int tx_bufSize = 4*tx_count;
 
-            // FPGA will send values in big-endian byte order
-            // If host machine is in little-endian byte order, convert to little-endian
+    //buffer for reading and writing to FPGA 
+    char* rx_buffer = (char*)malloc(rx_bufSize);  
+    char* tx_buffer = (char*)malloc(tx_bufSize); 
+
+    //Always send data to FPGA first
+    boost::shared_lock<boost::shared_mutex> lockRead(m_cmdTable.m_mutex);
+    Logger::Debug << "Client_RTDS - obtained mutex as reader" << std::endl;   
+    
+    //read from table
+    memcpy(tx_buffer, m_cmdTable.m_data, tx_bufSize);
+    Logger::Debug << "Client_RTDS - released reader mutex" << std::endl;
+    
+    // FPGA will send values in big-endian byte order
+    // If host machine is in little-endian byte order, convert to big-endian
             #if __BYTE_ORDER == __LITTLE_ENDIAN
-            endian_swap((char *)&txBuffer, tx_size);
-            #endif
-         
-            // send to FPGA
-            boost::asio::write( m_socket, boost::asio::buffer(txBuffer, tx_size) );
+    for(int i=0; i<tx_count; i++) {
+        endian_swap((char *)&tx_buffer[4*i], sizeof(float)); //should be 4 bytes in float.  
+    }
+#endif
+    // send to FPGA
+    boost::asio::write( m_socket, boost::asio::buffer(tx_buffer, tx_bufSize) );
            
-
-            //Receive data from FPGA next
-            boost::asio::read( m_socket, boost::asio::buffer(rxBuffer, rx_size) );
-
-            // FPGA will send values in big-endian byte order
-            // If host machine is in little-endian byte order, convert to little-endian
-            #if __BYTE_ORDER == __LITTLE_ENDIAN
-            endian_swap((char *)&rxBuffer, rx_size);
-            #endif
-           
-            boost::unique_lock<boost::shared_mutex> lock(m_stateData.m_mutex);
-            Logger::Debug << "Client_RTDS - obtained mutex as writer" << std::endl;
-
-            memcpy(m_stateData, rxBuffer, rx_size);
-            boost::shared_lock<boost::shared_mutex> unlock(m_stateData.m_mutex);
-            Logger::Debug << "Client_RTDS - released writer mutex" << std::endl;
-          
-            //Start the timer; on timeout, this function is called again
-            m_GlobalTimer.expires_from_now( boost::posix_time::microseconds(TIMESTEP) );
-            m_GlobalTimer.async_wait( boost::bind(&CClientRTDS::Run, this,
-                                                  boost::asio::placeholders::error)); 
-
+    
+    //Receive data from FPGA next
+    boost::asio::read( m_socket, boost::asio::buffer(rx_buffer, rx_bufSize) );
+    
+    // FPGA will send values in big-endian byte order
+    // If host machine is in little-endian byte order, convert to little-endian
+#if __BYTE_ORDER == __LITTLE_ENDIAN
+    for (int j=0; j<rx_count; j++){
+        endian_swap((char *)&rx_buffer[4*j], sizeof(float));
+    }
+#endif
+    
+    boost::unique_lock<boost::shared_mutex> lockWrite(m_stateTable.m_mutex);
+    Logger::Debug << "Client_RTDS - obtained mutex as writer" << std::endl;
+    //write to table    
+    memcpy(m_stateTable.m_data, rx_buffer, rx_bufSize);
+    Logger::Debug << "Client_RTDS - released writer mutex" << std::endl;
+        
+    m_GlobalTimer.async_wait( boost::bind(&CClientRTDS::Run, this));
 }
 
 void CClientRTDS::Set( const std::string p_device, const std::string p_key,
-    const std::string p_value )
+    double p_value )
 {
     //access and write to table
+    Logger::Info << __PRETTY_FUNCTION__ << std::endl;
+    m_cmdTable.SetValue( CDeviceKeyCoupled(p_device,p_key), p_value );
 }
 
-std::string CClientRTDS::Get( const std::string p_device, const std::string p_key )
+double CClientRTDS::Get( const std::string p_device, const std::string p_key )
 {
-    //access and write to table
-    //return value;
+    //access and read from table
+    Logger::Info << __PRETTY_FUNCTION__ << std::endl;
+    return m_stateTable.GetValue( CDeviceKeyCoupled(p_device, p_key) );
 }
 
 void CClientRTDS::Quit()
-{
-    
+{    
     // close connection
     m_socket.close();
 }
@@ -148,7 +161,7 @@ CClientRTDS::~CClientRTDS()
     }
 }
 
-void CCiientRTDS::endian_swap(char *data, const int num_bytes)
+void CClientRTDS::endian_swap(char *data, const int num_bytes)
 {
    char tmp[num_bytes];
 
@@ -158,7 +171,6 @@ void CCiientRTDS::endian_swap(char *data, const int num_bytes)
    for(int i=0; i<num_bytes; ++i)
       data[i] = tmp[i];
 }
-
 
   }//namespace broker
 }//namespace freedm

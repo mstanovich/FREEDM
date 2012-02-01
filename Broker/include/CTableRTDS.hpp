@@ -47,10 +47,9 @@
 CREATE_EXTERN_STD_LOGS()
 
 namespace freedm {
-namespace simulation {
+    namespace broker{
 
-class CSimulationServer;
-
+class CClientRTDS;
 ////////////////////////////////////////////////////////////////////////////////
 /// CTableRTDS
 ///
@@ -187,22 +186,23 @@ public:
     ///
     ////////////////////////////////////////////////////////////////////////////
     ~CTableRTDS();
-    
-private:
+
+     friend class CClientRTDS;
+private: 
     /// manages the XML specification
     CTableStructure m_structure;
     
     /// read-write mutex for m_data
     boost::shared_mutex m_mutex;
     
-    /// stored device variables
-    double * m_data;
+    /// stored device variables. Notice this is in float type
+    float * m_data;
     
     /// number of m_data elements
     size_t m_length;
 };
 
-} // namespace simulation
+    }//namespace broker
 } // namespace freedm
 
 #endif // C_TABLE_RTDS_HPP

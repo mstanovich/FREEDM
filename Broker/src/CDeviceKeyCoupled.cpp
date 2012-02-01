@@ -27,7 +27,6 @@
 #include "CDeviceKeyCoupled.hpp"
 
 namespace freedm {
-namespace simulation {
 
 bool operator<( const CDeviceKeyCoupled & p_lhs, const CDeviceKeyCoupled & p_rhs )
 {
@@ -46,5 +45,4 @@ CDeviceKeyCoupled::CDeviceKeyCoupled( const std::string & p_device, const std::s
     // skip
 }
 
-} // namespace simulation
 } // namespace freedm

@@ -27,7 +27,6 @@
 #include "CTableStructure.hpp"
 
 namespace freedm {
-namespace simulation {
 
 CTableStructure::CTableStructure( const std::string & p_xml, const std::string & p_tag )
 {
@@ -86,5 +85,4 @@ size_t CTableStructure::FindIndex( const CDeviceKeyCoupled & p_dkey ) const
     return( m_TableHeaders.by<SDevice>().at(p_dkey) );
 }
 
-} // namespace simulation
 } // namespace freedm

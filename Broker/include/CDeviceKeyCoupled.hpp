@@ -37,7 +37,6 @@
 #include <fstream>
 
 namespace freedm {
-namespace simulation {
 
 class CDeviceKeyCoupled;
 
@@ -157,7 +156,6 @@ private:
     std::string m_key;
 };
 
-} // namespace simulation
 } // namespace freedm
 
 #endif // C_DEVICE_KEY_HPP
