@@ -33,27 +33,30 @@
 #include "IPhysicalDevice.hpp"
 #include "CLineClient.hpp"
 
-namespace freedm {
-namespace broker {
-namespace device {
+namespace freedm
+{
+namespace broker
+{
+namespace device
+{
 
 
 /// PSCAD device with a line client to query device settings
 class CDeviceStructurePSCAD
-    : public IDeviceStructure
+        : public IDeviceStructure
 {
-public:
-    /// constructor which takes a line client
-    CDeviceStructurePSCAD( CLineClient::TPointer client );
-    
-    /// Gets the setting of some key from the register
-    virtual SettingValue Get( const SettingKey & key );
-    
-    /// Sets the value of some key in the register
-    virtual void Set( const SettingKey & key, const SettingValue & value );
-private:
-    /// Simulation line client
-    CLineClient::TPointer m_client;
+    public:
+        /// constructor which takes a line client
+        CDeviceStructurePSCAD( CLineClient::TPointer client );
+        
+        /// Gets the setting of some key from the register
+        virtual SettingValue Get( const SettingKey & key );
+        
+        /// Sets the value of some key in the register
+        virtual void Set( const SettingKey & key, const SettingValue & value );
+    private:
+        /// Simulation line client
+        CLineClient::TPointer m_client;
 };
 
 } // namespace device

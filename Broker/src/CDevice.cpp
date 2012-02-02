@@ -26,9 +26,12 @@
 
 #include "CDevice.hpp"
 
-namespace freedm {
-namespace broker {
-namespace device {
+namespace freedm
+{
+namespace broker
+{
+namespace device
+{
 
 ////////////////////////////////////////////////////////////////////////////////
 /// CDevice( CPhysicalDeviceManager &, Identifier, IDeviceStructure::DevicePtr )
@@ -40,10 +43,10 @@ namespace device {
 /// @param structure The implementation scheme of the device
 ////////////////////////////////////////////////////////////////////////////////
 CDevice::CDevice( CPhysicalDeviceManager & manager, Identifier device,
-    IDeviceStructure::DevicePtr structure )
-    : m_manager(manager)
-    , m_device(device)
-    , m_structure(structure)
+                  IDeviceStructure::DevicePtr structure )
+        : m_manager(manager)
+        , m_device(device)
+        , m_structure(structure)
 {
     // skip
 }
@@ -73,7 +76,7 @@ void CDevice::Set( const SettingKey & key, const SettingValue & value )
 {
     m_structure->Set(key,value);
 }
-    
+
 ////////////////////////////////////////////////////////////////////////////////
 /// GetManager()
 /// @description Accessor for m_manager

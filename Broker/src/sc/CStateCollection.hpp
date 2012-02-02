@@ -88,7 +88,7 @@ enum
 ///////////////////////////////////////////////////////////////////////////////
 
 class SCAgent : public IReadHandler, public SCPeerNode, public Templates::Singleton< SCAgent >,
-    public IAgent< boost::shared_ptr<SCPeerNode> >
+        public IAgent< boost::shared_ptr<SCPeerNode> >
 {
         friend class Templates::Singleton< SCAgent >;
     public:
@@ -126,14 +126,14 @@ class SCAgent : public IReadHandler, public SCPeerNode, public Templates::Single
     protected:
     
         //std::map< int, ptree >      collectstate;
-	std::map<StateVersion, ptree> collectstate;
+        std::map<StateVersion, ptree> collectstate;
         //std::map< int, ptree >::iterator it;
-	std::map<StateVersion, ptree>::iterator it;
+        std::map<StateVersion, ptree>::iterator it;
         int countstate;
-	int countmarker;
-
-	bool NotifyToSave;
-
+        int countmarker;
+        
+        bool NotifyToSave;
+        
         std::string module;
         
         StateVersion            m_curversion;

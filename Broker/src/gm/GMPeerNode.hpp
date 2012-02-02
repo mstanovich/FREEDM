@@ -47,15 +47,17 @@
 //CREATE_EXTERN_STD_LOGS();
 
 
-namespace freedm {
+namespace freedm
+{
 
 /// A container for an individual group management peer
-class GMPeerNode : public IPeerNode {
+class GMPeerNode : public IPeerNode
+{
     public:
         /// Constructs a peer.
         GMPeerNode(std::string uuid, ConnManagerPtr connmgr,
-            boost::asio::io_service& ios,
-            freedm::broker::CDispatcher& dispatch) :
+                   boost::asio::io_service& ios,
+                   freedm::broker::CDispatcher& dispatch) :
                 IPeerNode(uuid,connmgr,ios,dispatch) {};
         /// States this peer can be in.
         enum { NORMAL,DOWN,RECOVERY,REORGANIZATION,ELECTION };

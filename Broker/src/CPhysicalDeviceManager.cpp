@@ -12,11 +12,11 @@
 /// @license
 /// These source code files were created at as part of the
 /// FREEDM DGI Subthrust, and are
-/// intended for use in teaching or research.  They may be 
+/// intended for use in teaching or research.  They may be
 /// freely copied, modified and redistributed as long
 /// as modified versions are clearly marked as such and
 /// this notice is not removed.
-/// 
+///
 /// Neither the authors nor the FREEDM Project nor the
 /// National Science Foundation
 /// make any warranty, express or implied, nor assumes
@@ -24,8 +24,8 @@
 /// completeness or usefulness of these codes or any
 /// information distributed with these codes.
 ///
-/// Suggested modifications or questions about these codes 
-/// can be directed to Dr. Bruce McMillin, Department of 
+/// Suggested modifications or questions about these codes
+/// can be directed to Dr. Bruce McMillin, Department of
 /// Computer Science, Missouri University of Science and
 /// Technology, Rolla, MO  65409 (ff@mst.edu).
 ////////////////////////////////////////////////////////////////////
@@ -37,8 +37,10 @@ CREATE_EXTERN_STD_LOGS()
 
 #include <boost/bind.hpp>
 
-namespace freedm {
-namespace broker {
+namespace freedm
+{
+namespace broker
+{
 
 ///////////////////////////////////////////////////////////////////////////////
 /// @fn CPhysicalDeviceManager
@@ -86,7 +88,8 @@ device::CDevice::DevicePtr CPhysicalDeviceManager::GetDevice(
     device::Identifier devid)
 {
     iterator di = m_devices.find(devid);
-    if(di != m_devices.end())
+    
+    if (di != m_devices.end())
     {
         return di->second;
     }
@@ -106,8 +109,9 @@ device::CDevice::DevicePtr CPhysicalDeviceManager::GetDevice(
 ///////////////////////////////////////////////////////////////////////////////
 bool CPhysicalDeviceManager::DeviceExists(device::Identifier devid) const
 {
-    if(m_devices.count(devid))
+    if (m_devices.count(devid))
         return true;
+        
     return false;
 }
 

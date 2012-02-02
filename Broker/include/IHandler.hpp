@@ -3,10 +3,12 @@
 
 #include "CMessage.hpp"
 
-namespace boost {
-    namespace system {
-        class error_code;
-    }
+namespace boost
+{
+namespace system
+{
+class error_code;
+}
 }
 
 #include <boost/property_tree/ptree_fwd.hpp>
@@ -24,11 +26,11 @@ class IReadHandler
 /// incoming message with a matching body section.
 ///
 ///////////////////////////////////////////////////////////////////////////////
-public:
-    virtual ~IReadHandler(){}
-
-    /// Handle completion of a read operation.
-    virtual void HandleRead(freedm::broker::CMessage msg) = 0;
+    public:
+        virtual ~IReadHandler() {}
+        
+        /// Handle completion of a read operation.
+        virtual void HandleRead(freedm::broker::CMessage msg) = 0;
 };
 
 /// An interface for an object which writes on outgoing messages
@@ -49,11 +51,11 @@ class IWriteHandler
 ///
 /// Note: This interface may change
 ///////////////////////////////////////////////////////////////////////////////
-public:
-    virtual ~IWriteHandler(){}
-
-    /// Handle completion of a write operation.
-    virtual void HandleWrite( ptree &p_tree ) = 0;
+    public:
+        virtual ~IWriteHandler() {}
+        
+        /// Handle completion of a write operation.
+        virtual void HandleWrite( ptree &p_tree ) = 0;
 };
 
 #endif // IHANDLER_HPP

@@ -10,16 +10,16 @@
 ///
 /// @project   FREEDM DGI
 ///
-/// @description 
+/// @description
 ///
 /// @license
 /// These source code files were created at as part of the
 /// FREEDM DGI Subthrust, and are
-/// intended for use in teaching or research.  They may be 
+/// intended for use in teaching or research.  They may be
 /// freely copied, modified and redistributed as long
 /// as modified versions are clearly marked as such and
 /// this notice is not removed.
-/// 
+///
 /// Neither the authors nor the FREEDM Project nor the
 /// National Science Foundation
 /// make any warranty, express or implied, nor assumes
@@ -27,8 +27,8 @@
 /// completeness or usefulness of these codes or any
 /// information distributed with these codes.
 ///
-/// Suggested modifications or questions about these codes 
-/// can be directed to Dr. Bruce McMillin, Department of 
+/// Suggested modifications or questions about these codes
+/// can be directed to Dr. Bruce McMillin, Department of
 /// Computer Science, Missouri University of Science and
 /// Technology, Rolla, MO  65409 (ff@mst.edu).
 ////////////////////////////////////////////////////////////////////
@@ -47,8 +47,10 @@
 #include <boost/property_tree/ptree.hpp>
 using boost::property_tree::ptree;
 
-namespace freedm {
-    namespace broker {
+namespace freedm
+{
+namespace broker
+{
 ///////////////////////////////////////////////////////////////////////////////
 /// @fn CListener::CListener
 /// @description Constructor for the CConnection object. Since the change to
@@ -58,13 +60,13 @@ namespace freedm {
 /// @post A new CConnection object is initialized.
 /// @param p_ioService The socket to use for the connection.
 /// @param p_manager The related connection manager that tracks this object.
-/// @param p_dispatch The dispatcher responsible for applying read/write 
+/// @param p_dispatch The dispatcher responsible for applying read/write
 ///   handlers to messages.
 /// @param uuid: The uuid this node connects to, or what listener.
 ///////////////////////////////////////////////////////////////////////////////
 CListener::CListener(boost::asio::io_service& p_ioService,
-  CConnectionManager& p_manager, CDispatcher& p_dispatch, std::string uuid)
-  : CReliableConnection(p_ioService,p_manager,p_dispatch,uuid)
+                     CConnectionManager& p_manager, CDispatcher& p_dispatch, std::string uuid)
+        : CReliableConnection(p_ioService,p_manager,p_dispatch,uuid)
 {
     Logger::Debug << __PRETTY_FUNCTION__ << std::endl;
 }
@@ -80,8 +82,8 @@ void CListener::Start()
 {
     Logger::Debug << __PRETTY_FUNCTION__ << std::endl;
     GetSocket().async_receive_from(boost::asio::buffer(m_buffer, 8192), m_endpoint,
-        boost::bind(&CListener::HandleRead, this,
-            boost::asio::placeholders::error, boost::asio::placeholders::bytes_transferred));
+                                   boost::bind(&CListener::HandleRead, this,
+                                               boost::asio::placeholders::error, boost::asio::placeholders::bytes_transferred));
 }
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -97,7 +99,7 @@ void CListener::Stop()
 {
     Logger::Debug << __PRETTY_FUNCTION__ << std::endl;
 }
- 
+
 ///////////////////////////////////////////////////////////////////////////////
 /// @fn CListener::SendACK
 /// @description Sends an acknowledgement of message reciept back to sender.
@@ -134,55 +136,62 @@ void CListener::SendACK(std::string uuid, remotehost hostname, unsigned int sequ
 ///////////////////////////////////////////////////////////////////////////////
 void CListener::HandleRead(const boost::system::error_code& e, std::size_t bytes_transferred)
 {
-    Logger::Debug << __PRETTY_FUNCTION__ << std::endl;       
+    Logger::Debug << __PRETTY_FUNCTION__ << std::endl;
+    
     if (!e)
     {
         Logger::Debug << "Handled some message." << std::endl;
         boost::tribool result_;
         boost::tie(result_, boost::tuples::ignore) = Parse(
-            m_message, m_buffer.data(),
-            m_buffer.data() + bytes_transferred);
+                    m_message, m_buffer.data(),
+                    m_buffer.data() + bytes_transferred);
+                    
         if (result_)
         {
             // Unfortunately, this (sequencing) can't be done with the read handler
             // So it has to be a bit messier. m_message is the incoming
             // CMessage. We scan this for the stamp that we place on a
             // Message before we send it with the sequence number:
-            ptree x = static_cast<ptree>(m_message); 
+            ptree x = static_cast<ptree>(m_message);
             unsigned int sequenceno = m_message.GetSequenceNumber();
             std::string uuid = m_message.GetSourceUUID();
             remotehost hostname = m_message.GetSourceHostname();
-            #ifdef CUSTOMNETWORK
-            if((rand()%100) >= GetReliability())
+#ifdef CUSTOMNETWORK
+            
+            if ((rand()%100) >= GetReliability())
             {
                 Logger::Info<<"Incoming Packet Dropped ("<<GetReliability()
-                              <<") -> "<<uuid<<std::endl;
+                <<") -> "<<uuid<<std::endl;
                 goto listen;
             }
-            #ifdef DATAGRAM
+            
+#ifdef DATAGRAM
             else
             {
                 goto accept;
             }
-            #endif
-            #endif
-            if(m_message.GetStatus() == freedm::broker::CMessage::Accepted)
+            
+#endif
+#endif
+            
+            if (m_message.GetStatus() == freedm::broker::CMessage::Accepted)
             {
                 Logger::Debug << "Got ACK #" << sequenceno << std::endl;
                 GetConnectionManager().PutHostname(uuid,hostname);
                 GetConnectionManager().GetConnectionByUUID(uuid, GetSocket().get_io_service(), GetDispatcher())->RecieveACK(sequenceno);
             }
-            else if(m_message.GetStatus() == freedm::broker::CMessage::Created)
+            else if (m_message.GetStatus() == freedm::broker::CMessage::Created)
             {
                 Logger::Info << "Got SYN #" << sequenceno << std::endl;
                 m_insequenceno[uuid] = sequenceno;
                 SendACK(uuid,hostname,m_insequenceno[uuid]);
             }
-            else if(m_insequenceno.find(uuid) != m_insequenceno.end())
+            else if (m_insequenceno.find(uuid) != m_insequenceno.end())
             {
-                Logger::Debug << "Got Message #" << sequenceno << " expected " 
-                               << m_insequenceno[uuid]+1 % GetSequenceModulo() << std::endl;
-                if(sequenceno == (m_insequenceno[uuid]+1) % GetSequenceModulo())
+                Logger::Debug << "Got Message #" << sequenceno << " expected "
+                << m_insequenceno[uuid]+1 % GetSequenceModulo() << std::endl;
+                
+                if (sequenceno == (m_insequenceno[uuid]+1) % GetSequenceModulo())
                 {
                     // The sequence number is what we expect.
                     m_insequenceno[uuid] = (m_insequenceno[uuid]+1) % GetSequenceModulo();
@@ -196,8 +205,8 @@ void CListener::HandleRead(const boost::system::error_code& e, std::size_t bytes
                     // write now, this is written to accept all messages, but
                     // later we'll end in a "trust table" that epidemically
                     // distributes trust in the system. Messages are rejected until
-                    // Trust is established or something. 
-                    accept:
+                    // Trust is established or something.
+accept:
                     GetDispatcher().HandleRequest(m_message);
                 }
                 else
@@ -206,16 +215,17 @@ void CListener::HandleRead(const boost::system::error_code& e, std::size_t bytes
                 }
             }
         }
-        listen:
+        
+listen:
         GetSocket().async_receive_from(boost::asio::buffer(m_buffer, 8192), m_endpoint,
-            boost::bind(&CListener::HandleRead, this,
-                boost::asio::placeholders::error, boost::asio::placeholders::bytes_transferred)); 
+                                       boost::bind(&CListener::HandleRead, this,
+                                                   boost::asio::placeholders::error, boost::asio::placeholders::bytes_transferred));
     }
     else
     {
-        GetConnectionManager().Stop(CListener::ConnectionPtr(this));	
+        GetConnectionManager().Stop(CListener::ConnectionPtr(this));
     }
 }
 
-    } // namespace broker
+} // namespace broker
 } // namespace freedm

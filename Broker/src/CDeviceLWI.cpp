@@ -27,9 +27,12 @@
 
 #include "CDeviceLWI.hpp"
 
-namespace freedm {
-namespace broker {
-namespace device {
+namespace freedm
+{
+namespace broker
+{
+namespace device
+{
 
 ////////////////////////////////////////////////////////////////////////////////
 /// turnOn()

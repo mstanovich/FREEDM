@@ -27,15 +27,18 @@
 #include "CDeviceFactory.hpp"
 #include "config.hpp"
 
-namespace freedm {
-namespace broker {
-namespace device {
+namespace freedm
+{
+namespace broker
+{
+namespace device
+{
 
 /// Creates an instance of a device factory
 CDeviceFactory::CDeviceFactory( CPhysicalDeviceManager & manager,
-    boost::asio::io_service & ios, const std::string & host,
+                                boost::asio::io_service & ios, const std::string & host,
                                 const std::string & port, const std::string xml )
-    : m_manager(manager)
+        : m_manager(manager)
 {
 #if defined USE_DEVICE_PSCAD
     m_client(CLineClient::Create(ios));

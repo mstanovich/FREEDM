@@ -53,91 +53,93 @@
 #include "uuid.hpp"
 #include "IHandler.hpp"
 
-namespace freedm {
-namespace broker {
+namespace freedm
+{
+namespace broker
+{
 
 /// Manages open connections so that they may be cleanly stopped
 class CConnectionManager
-    : private boost::noncopyable
+        : private boost::noncopyable
 {
-public:
-    /// Typedef for the map which handles uuid to hostname
-    typedef std::map<std::string, remotehost> hostnamemap;
-    
-    /// Typedef for the map which handles uuid to connection 
-    typedef boost::bimap<std::string, ConnectionPtr> connectionmap;
-
-    /// Initialize the connection manager with the node uuid.
-    CConnectionManager(freedm::uuid uuid, std::string hostname);
-
-    /// Connection manager teardown.
-    ~CConnectionManager() {  };
-
-    /// Add the specified connection to the manager and start it.
-    void Start(CListener::ConnectionPtr c);
- 
-    /// Place a hostname and uuid into the hostname / uuid map.
-    void PutHostname(std::string u_, std::string host_, std::string port);
-   
-    /// Place a hostname and uuid into the hostname / uuid map.
-    void PutHostname(std::string u_, remotehost host_);
- 
-    /// Register a connection with the manager once it has been built.
-    void PutConnection(std::string uuid, ConnectionPtr c);
-
-    /// Stop the specified connection.
-    void Stop(CConnection::ConnectionPtr c);
-    
-    /// Stop the specified connection
-    void Stop(CListener::ConnectionPtr c);
-
-    /// Stop all connections.
-    void StopAll();
-
-    /// Get The UUID
-    std::string GetUUID() { return m_uuid; };
-
-    /// Get The Hostname
-    remotehost GetHostname() { return m_hostname; };
-    
-    /// Get the hostname from the UUID.
-    remotehost GetHostnameByUUID( std::string uuid ) const; 
-
-    /// Fetch a connection pointer via UUID
-    ConnectionPtr GetConnectionByUUID( std::string uuid_,  boost::asio::io_service& ios,  CDispatcher &dispatch_ );
-
-    /// An iterator to the beginning of the hostname map
-    hostnamemap::iterator GetHostnamesBegin() { return m_hostnames.begin(); };
-
-    /// An iterator to the end of the hostname map.
-    hostnamemap::iterator GetHostnamesEnd() { return m_hostnames.end(); };
-
-    /// An iterator to the specified hostname.
-    hostnamemap::iterator GetHostname(std::string uuid) { return m_hostnames.find(uuid); };
-
-    /// Iterator to the beginning of the connection map.
-    connectionmap::iterator GetConnectionsBegin() { return m_connections.begin(); };
-
-    /// Iterator to the end of the connections map.
-    connectionmap::iterator GetConnectionsEnd() { return m_connections.end(); };
-    
-    // Transient Network Simulation
-    /// Load a network configuration & apply it.
-    void LoadNetworkConfig();
-
-private:
-    /// Mapping from uuid to hostname.
-    hostnamemap m_hostnames;
-    /// Hostname of this node.
-    remotehost m_hostname;
-    /// Forward map (UUID->Connection)
-    connectionmap   m_connections;
-    /// Incoming messages channel
-    CListener::ConnectionPtr m_inchannel;
-    /// Node UUID
-    std::string m_uuid;
-    /// Mutex for protecting the handler maps above
-    boost::mutex m_Mutex;       
+    public:
+        /// Typedef for the map which handles uuid to hostname
+        typedef std::map<std::string, remotehost> hostnamemap;
+        
+        /// Typedef for the map which handles uuid to connection
+        typedef boost::bimap<std::string, ConnectionPtr> connectionmap;
+        
+        /// Initialize the connection manager with the node uuid.
+        CConnectionManager(freedm::uuid uuid, std::string hostname);
+        
+        /// Connection manager teardown.
+        ~CConnectionManager() {  };
+        
+        /// Add the specified connection to the manager and start it.
+        void Start(CListener::ConnectionPtr c);
+        
+        /// Place a hostname and uuid into the hostname / uuid map.
+        void PutHostname(std::string u_, std::string host_, std::string port);
+        
+        /// Place a hostname and uuid into the hostname / uuid map.
+        void PutHostname(std::string u_, remotehost host_);
+        
+        /// Register a connection with the manager once it has been built.
+        void PutConnection(std::string uuid, ConnectionPtr c);
+        
+        /// Stop the specified connection.
+        void Stop(CConnection::ConnectionPtr c);
+        
+        /// Stop the specified connection
+        void Stop(CListener::ConnectionPtr c);
+        
+        /// Stop all connections.
+        void StopAll();
+        
+        /// Get The UUID
+        std::string GetUUID() { return m_uuid; };
+        
+        /// Get The Hostname
+        remotehost GetHostname() { return m_hostname; };
+        
+        /// Get the hostname from the UUID.
+        remotehost GetHostnameByUUID( std::string uuid ) const;
+        
+        /// Fetch a connection pointer via UUID
+        ConnectionPtr GetConnectionByUUID( std::string uuid_,  boost::asio::io_service& ios,  CDispatcher &dispatch_ );
+        
+        /// An iterator to the beginning of the hostname map
+        hostnamemap::iterator GetHostnamesBegin() { return m_hostnames.begin(); };
+        
+        /// An iterator to the end of the hostname map.
+        hostnamemap::iterator GetHostnamesEnd() { return m_hostnames.end(); };
+        
+        /// An iterator to the specified hostname.
+        hostnamemap::iterator GetHostname(std::string uuid) { return m_hostnames.find(uuid); };
+        
+        /// Iterator to the beginning of the connection map.
+        connectionmap::iterator GetConnectionsBegin() { return m_connections.begin(); };
+        
+        /// Iterator to the end of the connections map.
+        connectionmap::iterator GetConnectionsEnd() { return m_connections.end(); };
+        
+        // Transient Network Simulation
+        /// Load a network configuration & apply it.
+        void LoadNetworkConfig();
+        
+    private:
+        /// Mapping from uuid to hostname.
+        hostnamemap m_hostnames;
+        /// Hostname of this node.
+        remotehost m_hostname;
+        /// Forward map (UUID->Connection)
+        connectionmap   m_connections;
+        /// Incoming messages channel
+        CListener::ConnectionPtr m_inchannel;
+        /// Node UUID
+        std::string m_uuid;
+        /// Mutex for protecting the handler maps above
+        boost::mutex m_Mutex;
 };
 
 } // namespace broker

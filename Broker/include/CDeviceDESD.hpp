@@ -32,30 +32,33 @@
 
 #include "CDevice.hpp"
 
-namespace freedm {
-namespace broker {
+namespace freedm
+{
+namespace broker
+{
 
 // forward declaration of device manager
 class CPhysicalDeviceManager;
 
-namespace device {
+namespace device
+{
 
 /// Implementation of distributed energy storage devices
 class CDeviceDESD
-    : public virtual CDevice
+        : public virtual CDevice
 {
-public:
-    /// Convenience type for a shared pointer to self
-    typedef boost::shared_ptr<CDeviceDESD> DevicePtr;
-    
-    /// Constructor which takes a manager, identifier, and internal structure
-    CDeviceDESD( CPhysicalDeviceManager & manager, Identifier device,
-        IDeviceStructure::DevicePtr structure )
-        : CDevice(manager,device,structure)
+    public:
+        /// Convenience type for a shared pointer to self
+        typedef boost::shared_ptr<CDeviceDESD> DevicePtr;
+        
+        /// Constructor which takes a manager, identifier, and internal structure
+        CDeviceDESD( CPhysicalDeviceManager & manager, Identifier device,
+                     IDeviceStructure::DevicePtr structure )
+                : CDevice(manager,device,structure)
         {}
-    
-    /// Virtual destructor for derived classes
-    virtual ~CDeviceDESD() {}
+        
+        /// Virtual destructor for derived classes
+        virtual ~CDeviceDESD() {}
 };
 
 } // namespace device

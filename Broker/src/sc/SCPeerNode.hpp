@@ -68,7 +68,7 @@ class SCPeerNode : public IPeerNode
         SCPeerNode(std::string uuid, ConnManagerPtr connmgr,
                    boost::asio::io_service& ios,
                    freedm::broker::CDispatcher& dispatch):
-            IPeerNode(uuid, connmgr, ios, dispatch) {};
+                IPeerNode(uuid, connmgr, ios, dispatch) {};
         enum EStatus {Sleeping = 0,Collecting};
 };
 

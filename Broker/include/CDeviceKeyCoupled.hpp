@@ -8,7 +8,7 @@
 /// @project Missouri S&T Power Research Group
 ///
 /// @description
-/// Defines a new class that holds both deviceID and key for easy matching with an index. 
+/// Defines a new class that holds both deviceID and key for easy matching with an index.
 ///
 /// @functions
 /// operator<( const CDeviceKey &, const CDeviceKey & )
@@ -36,8 +36,10 @@
 #include <string>
 #include <fstream>
 
-namespace freedm {
-    namespace broker {
+namespace freedm
+{
+namespace broker
+{
 class CDeviceKeyCoupled;
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -117,45 +119,45 @@ std::ostream & operator<<( std::ostream & p_os, const CDeviceKeyCoupled & p_dkey
 ////////////////////////////////////////////////////////////////////////////////
 class CDeviceKeyCoupled
 {
-public:
-    ////////////////////////////////////////////////////////////////////////////
-    /// CDeviceKeyCoupled( const string &, const string & )
-    ///
-    /// @description
-    /// Creates an instance of a device-key combo object.
-    ///
-    /// @Shared_Memory
-    /// none
-    ///
-    /// @Error_Handling
-    /// none
-    ///
-    /// @pre
-    /// none
-    ///
-    /// @post
-    /// none
-    ///
-    /// @param
-    /// p_device is the unique device identifier
-    /// p_key is the device variable of interest
-    ///
-    /// @limitations
-    /// none
-    ///
-    ////////////////////////////////////////////////////////////////////////////
-    CDeviceKeyCoupled( const std::string & p_device, const std::string & p_key );
-    
-    friend bool operator<( const CDeviceKeyCoupled & p_lhs, const CDeviceKeyCoupled & p_rhs );
-    friend std::ostream & operator<<( std::ostream & p_os, const CDeviceKeyCoupled & p_dkey );
-private:
-    /// unique device identifier
-    std::string m_device;
-    
-    /// variable of interest
-    std::string m_key;
+    public:
+        ////////////////////////////////////////////////////////////////////////////
+        /// CDeviceKeyCoupled( const string &, const string & )
+        ///
+        /// @description
+        /// Creates an instance of a device-key combo object.
+        ///
+        /// @Shared_Memory
+        /// none
+        ///
+        /// @Error_Handling
+        /// none
+        ///
+        /// @pre
+        /// none
+        ///
+        /// @post
+        /// none
+        ///
+        /// @param
+        /// p_device is the unique device identifier
+        /// p_key is the device variable of interest
+        ///
+        /// @limitations
+        /// none
+        ///
+        ////////////////////////////////////////////////////////////////////////////
+        CDeviceKeyCoupled( const std::string & p_device, const std::string & p_key );
+        
+        friend bool operator<( const CDeviceKeyCoupled & p_lhs, const CDeviceKeyCoupled & p_rhs );
+        friend std::ostream & operator<<( std::ostream & p_os, const CDeviceKeyCoupled & p_dkey );
+    private:
+        /// unique device identifier
+        std::string m_device;
+        
+        /// variable of interest
+        std::string m_key;
 };
-    }//namespace broker
+}//namespace broker
 } // namespace freedm
 
 #endif // C_DEVICE_KEY_COUPLED_HPP

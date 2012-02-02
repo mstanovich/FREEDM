@@ -21,11 +21,11 @@
 /// @license
 /// These source code files were created at as part of the
 /// FREEDM DGI Subthrust, and are
-/// intended for use in teaching or research.  They may be 
+/// intended for use in teaching or research.  They may be
 /// freely copied, modified and redistributed as long
 /// as modified versions are clearly marked as such and
 /// this notice is not removed.
-/// 
+///
 /// Neither the authors nor the FREEDM Project nor the
 /// National Science Foundation
 /// make any warranty, express or implied, nor assumes
@@ -33,8 +33,8 @@
 /// completeness or usefulness of these codes or any
 /// information distributed with these codes.
 ///
-/// Suggested modifications or questions about these codes 
-/// can be directed to Dr. Bruce McMillin, Department of 
+/// Suggested modifications or questions about these codes
+/// can be directed to Dr. Bruce McMillin, Department of
 /// Computer Science, Missour University of Science and
 /// Technology, Rolla, MO  65409 (ff@mst.edu).
 ///
@@ -52,49 +52,51 @@
 #include <string>
 #include <boost/noncopyable.hpp>
 
-namespace freedm {
-    namespace broker {
+namespace freedm
+{
+namespace broker
+{
 
 /// Central monolith of the Broker Architecture.
 class CBroker : private boost::noncopyable
 {
 
-public:
-    /// Initialize the broker and begin accepting connections and messages 
-    explicit CBroker(const std::string& address, const std::string& port,
-                   CDispatcher& p_dispatch, boost::asio::io_service &m_ios,
-                   freedm::broker::CConnectionManager &m_conMan);
-
-    /// Run the Server's io_service loop.
-    void Run();
- 
-    /// Return a reference to the IO Service
-    boost::asio::io_service& GetIOService();
-
-    /// Puts the stop request into the ioservice queue.
-    void Stop();
-
-    /// Stop the server.
-    void HandleStop();
-    
- private:
-    /// Handle completion of an asynchronous accept operation.
-    void HandleAccept(const boost::system::error_code& e);
-
-    /// The io_service used to perform asynchronous operations.
-    boost::asio::io_service &m_ioService;
-
-    /// The connection manager which owns all live connections.
-    CConnectionManager &m_connManager;
-
-    /// The handler for all incoming requests.
-    CDispatcher &m_dispatch;
-
-    ///The Broker's pointer to the listening socket
-    CListener::ConnectionPtr m_newConnection;
+    public:
+        /// Initialize the broker and begin accepting connections and messages
+        explicit CBroker(const std::string& address, const std::string& port,
+                         CDispatcher& p_dispatch, boost::asio::io_service &m_ios,
+                         freedm::broker::CConnectionManager &m_conMan);
+                         
+        /// Run the Server's io_service loop.
+        void Run();
+        
+        /// Return a reference to the IO Service
+        boost::asio::io_service& GetIOService();
+        
+        /// Puts the stop request into the ioservice queue.
+        void Stop();
+        
+        /// Stop the server.
+        void HandleStop();
+        
+    private:
+        /// Handle completion of an asynchronous accept operation.
+        void HandleAccept(const boost::system::error_code& e);
+        
+        /// The io_service used to perform asynchronous operations.
+        boost::asio::io_service &m_ioService;
+        
+        /// The connection manager which owns all live connections.
+        CConnectionManager &m_connManager;
+        
+        /// The handler for all incoming requests.
+        CDispatcher &m_dispatch;
+        
+        ///The Broker's pointer to the listening socket
+        CListener::ConnectionPtr m_newConnection;
 };
 
-    } // namespace broker
+} // namespace broker
 } // namespace freedm
 
 #endif // FREEDM_BROKER_HPP

@@ -32,23 +32,26 @@
 
 #include "IPhysicalDevice.hpp"
 
-namespace freedm {
-namespace broker {
-namespace device {
+namespace freedm
+{
+namespace broker
+{
+namespace device
+{
 
 /// Generic device with a register to store device settings
 class CDeviceStructureGeneric
-    : public IDeviceStructure
+        : public IDeviceStructure
 {
-public:
-    /// Gets the setting of some key from the register
-    virtual SettingValue Get( const SettingKey & key );
-    
-    /// Sets the value of some key in the register
-    virtual void Set( const SettingKey & key, const SettingValue & value );
-private:
-    /// Register of current device settings
-    std::map<SettingKey,SettingValue> m_register;
+    public:
+        /// Gets the setting of some key from the register
+        virtual SettingValue Get( const SettingKey & key );
+        
+        /// Sets the value of some key in the register
+        virtual void Set( const SettingKey & key, const SettingValue & value );
+    private:
+        /// Register of current device settings
+        std::map<SettingKey,SettingValue> m_register;
 };
 
 } // namespace device

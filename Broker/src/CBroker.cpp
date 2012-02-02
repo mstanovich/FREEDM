@@ -26,7 +26,7 @@
 /// research.  They may be freely copied, modified and redistributed
 /// as long as modified versions are clearly marked as such and
 /// this notice is not removed.
-/// 
+///
 /// Neither the authors nor the FREEDM Project nor the
 /// National Science Foundation
 /// make any warranty, express or implied, nor assumes
@@ -34,8 +34,8 @@
 /// completeness or usefulness of these codes or any
 /// information distributed with these codes.
 ///
-/// Suggested modifications or questions about these codes 
-/// can be directed to Dr. Bruce McMillin, Department of 
+/// Suggested modifications or questions about these codes
+/// can be directed to Dr. Bruce McMillin, Department of
 /// Computer Science, Missouri University of Science and
 /// Technology, Rolla, MO  65409 (ff@mst.edu).
 ////////////////////////////////////////////////////////////////////
@@ -49,9 +49,11 @@ CREATE_EXTERN_STD_LOGS()
 #include <boost/asio/io_service.hpp>
 
 /// General FREEDM Namespace
-namespace freedm {
-    /// Broker Architecture Namespace
-    namespace broker {
+namespace freedm
+{
+/// Broker Architecture Namespace
+namespace broker
+{
 
 ///////////////////////////////////////////////////////////////////////////////
 /// @fn CBroker::CBroker
@@ -71,19 +73,18 @@ namespace freedm {
 /// @limiations Fails if the port is already in use.
 ///////////////////////////////////////////////////////////////////////////////
 CBroker::CBroker(const std::string& p_address, const std::string& p_port,
-    CDispatcher &p_dispatch, boost::asio::io_service &m_ios,
-    freedm::broker::CConnectionManager &m_conMan)
-    : m_ioService(m_ios),
-      m_connManager(m_conMan),
-      m_dispatch(p_dispatch),
-      m_newConnection(new CListener(m_ioService, m_connManager, m_dispatch, m_conMan.GetUUID()))
+                 CDispatcher &p_dispatch, boost::asio::io_service &m_ios,
+                 freedm::broker::CConnectionManager &m_conMan)
+        : m_ioService(m_ios),
+        m_connManager(m_conMan),
+        m_dispatch(p_dispatch),
+        m_newConnection(new CListener(m_ioService, m_connManager, m_dispatch, m_conMan.GetUUID()))
 {
     Logger::Debug << __PRETTY_FUNCTION__ << std::endl;
     // Open the acceptor with the option to reuse the address (i.e. SO_REUSEADDR).
     boost::asio::ip::udp::resolver resolver(m_ioService);
     boost::asio::ip::udp::resolver::query query( p_address, p_port);
     boost::asio::ip::udp::endpoint endpoint = *resolver.resolve( query );
-    
     // Listen for connections and create an event to spawn a new connection
     m_newConnection->GetSocket().open(endpoint.protocol());
     m_newConnection->GetSocket().bind(endpoint);;
@@ -151,8 +152,8 @@ void CBroker::HandleStop()
     // operations. Once all operations have finished the io_service::run() call
     // will exit.
     m_connManager.StopAll();
-    m_ioService.stop(); 
+    m_ioService.stop();
 }
 
-    } // namespace broker
+} // namespace broker
 } // namespace freedm

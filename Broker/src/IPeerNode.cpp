@@ -3,7 +3,7 @@
 ///
 /// @author       Derek Ditch <dpdm85@mst.edu>
 ///               Ravi Akella <rcaq5c@mst.edu>
-///               Stephen Jackson <scj7t4@mst.edu>    
+///               Stephen Jackson <scj7t4@mst.edu>
 ///
 /// @compiler     C++
 ///
@@ -51,7 +51,8 @@
 
 CREATE_EXTERN_STD_LOGS()
 
-namespace freedm {
+namespace freedm
+{
 
 
 /////////////////////////////////////////////////////////////
@@ -65,11 +66,11 @@ namespace freedm {
 /// @param dispatch The dispatcher used to deliver messages
 /////////////////////////////////////////////////////////////
 IPeerNode::IPeerNode(std::string uuid, ConnManagerPtr connmgr,
-    boost::asio::io_service& ios, freedm::broker::CDispatcher& dispatch)
-    : m_uuid(uuid),
-      m_connmgr(connmgr),
-      m_ios(ios),
-      m_dispatch(dispatch)
+                     boost::asio::io_service& ios, freedm::broker::CDispatcher& dispatch)
+        : m_uuid(uuid),
+        m_connmgr(connmgr),
+        m_ios(ios),
+        m_dispatch(dispatch)
 {
     Logger::Debug << __PRETTY_FUNCTION__ << std::endl;
 }
@@ -95,7 +96,7 @@ void IPeerNode::SetStatus(int status)
 /// @description Uses the connection manager to attempt to
 ///   get a connection pointer to this node.
 /// @pre None
-/// @post If enough is known about the uuid, a connection 
+/// @post If enough is known about the uuid, a connection
 ///   will exist with the connection manager.
 /// @return A ConnectionPtr for the connection to this peer.
 /////////////////////////////////////////////////////////////
@@ -113,7 +114,7 @@ broker::ConnectionPtr IPeerNode::GetConnection()
 ///   now, we use UDP and it doesn't matter.
 /// @pre None
 /// @post A message is sent to the peer represented by this
-///   object 
+///   object
 /// @param msg The message to write to channel
 /// @return True if the message was sent.
 /////////////////////////////////////////////////////////////
@@ -122,7 +123,8 @@ bool IPeerNode::Send(freedm::broker::CMessage msg)
     try
     {
         broker::ConnectionPtr c = GetConnection();
-        if(c.get() != NULL)
+        
+        if (c.get() != NULL)
         {
             //Schedule the send with the io_service thread
             c->Send(msg);
@@ -133,11 +135,12 @@ bool IPeerNode::Send(freedm::broker::CMessage msg)
             return false;
         }
     }
-    catch(boost::system::system_error& e)
+    catch (boost::system::system_error& e)
     {
         Logger::Info << "Couldn't Send Message To Peer (Sending Failed)" << std::endl;
         return false;
     }
+    
     Logger::Debug << "Sent message to peer" << std::endl;
     return true;
 }
@@ -145,7 +148,7 @@ bool IPeerNode::Send(freedm::broker::CMessage msg)
 /////////////////////////////////////////////////////////////
 /// @fn IPeerNode::ASyncSend
 /// @description Calls send. This function is depreciated by
-///   our change to UDP. 
+///   our change to UDP.
 /////////////////////////////////////////////////////////////
 void IPeerNode::AsyncSend(freedm::broker::CMessage msg)
 {
@@ -159,7 +162,7 @@ void IPeerNode::AsyncSend(freedm::broker::CMessage msg)
 ///////////////////////////////////////////////////////////////////////////////
 bool operator==(const IPeerNode& a, const IPeerNode& b)
 {
-  return (a.GetUUID() == b.GetUUID());
+    return (a.GetUUID() == b.GetUUID());
 }
 //////////////////////////////////////////////////////////////////////////////
 /// @fn operator<
@@ -168,7 +171,7 @@ bool operator==(const IPeerNode& a, const IPeerNode& b)
 /////////////////////////////////////////////////////////////////////////////
 bool operator<(const IPeerNode& a, const IPeerNode& b)
 {
-  return (a.GetUUID() < b.GetUUID());
+    return (a.GetUUID() < b.GetUUID());
 }
 
 }

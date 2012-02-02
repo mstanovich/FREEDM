@@ -34,102 +34,105 @@
 #include "CDeviceDESD.hpp"
 #include "CDeviceLOAD.hpp"
 
-namespace freedm {
-namespace broker {
+namespace freedm
+{
+namespace broker
+{
 
 // forward declaration of device manager
 class CPhysicalDeviceManager;
 
-namespace device {
+namespace device
+{
 
 /// Common implementation of LWI devices
 class CDeviceLWI
-    : public virtual CDevice
+        : public virtual CDevice
 {
-public:
-    /// Convenience type for a shared pointer to self
-    typedef boost::shared_ptr<CDeviceLWI> DevicePtr;
-    
-    /// Constructor which takes a manager, identifier, and internal structure
-    CDeviceLWI( CPhysicalDeviceManager & manager, Identifier device,
-        IDeviceStructure::DevicePtr structure )
-        : CDevice(manager,device,structure)
+    public:
+        /// Convenience type for a shared pointer to self
+        typedef boost::shared_ptr<CDeviceLWI> DevicePtr;
+        
+        /// Constructor which takes a manager, identifier, and internal structure
+        CDeviceLWI( CPhysicalDeviceManager & manager, Identifier device,
+                    IDeviceStructure::DevicePtr structure )
+                : CDevice(manager,device,structure)
         {}
-    
-    /// Virtual destructor for derived classes
-    virtual ~CDeviceLWI() {}
-    
-    /// Activate the device
-    void turnOn();
-    
-    /// Deactivate the device
-    void turnOff();
-    
-    /// Get the device power (positive indicates discharge)
-    SettingValue get_powerLevel();
+        
+        /// Virtual destructor for derived classes
+        virtual ~CDeviceLWI() {}
+        
+        /// Activate the device
+        void turnOn();
+        
+        /// Deactivate the device
+        void turnOff();
+        
+        /// Get the device power (positive indicates discharge)
+        SettingValue get_powerLevel();
 };
 
 /// Physical batteries for the LWI project
 class CDeviceLWI_Battery
-    : public CDeviceLWI
-    , public CDeviceDESD
+        : public CDeviceLWI
+        , public CDeviceDESD
 {
-public:
-    /// Convenience type for a shared pointer to self
-    typedef boost::shared_ptr<CDeviceLWI_Battery> DevicePtr;
-    
-    /// Constructor which takes a manager, identifier, and internal structure
-    CDeviceLWI_Battery( CPhysicalDeviceManager & manager, Identifier device,
-        IDeviceStructure::DevicePtr structure )
-        : CDevice(manager,device,structure)
-        , CDeviceLWI(manager,device,structure)
-        , CDeviceDESD(manager,device,structure)
+    public:
+        /// Convenience type for a shared pointer to self
+        typedef boost::shared_ptr<CDeviceLWI_Battery> DevicePtr;
+        
+        /// Constructor which takes a manager, identifier, and internal structure
+        CDeviceLWI_Battery( CPhysicalDeviceManager & manager, Identifier device,
+                            IDeviceStructure::DevicePtr structure )
+                : CDevice(manager,device,structure)
+                , CDeviceLWI(manager,device,structure)
+                , CDeviceDESD(manager,device,structure)
         {}
-    
-    /// Virtual destructor for derived classes
-    virtual ~CDeviceLWI_Battery() {}
+        
+        /// Virtual destructor for derived classes
+        virtual ~CDeviceLWI_Battery() {}
 };
 
 /// Physical loads for the LWI project
 class CDeviceLWI_Load
-    : public CDeviceLWI
-    , public CDeviceLOAD
+        : public CDeviceLWI
+        , public CDeviceLOAD
 {
-public:
-    /// Convenience type for a shared pointer to self
-    typedef boost::shared_ptr<CDeviceLWI_Load> DevicePtr;
-    
-    /// Constructor which takes a manager, identifier, and internal structure
-    CDeviceLWI_Load( CPhysicalDeviceManager & manager, Identifier device,
-        IDeviceStructure::DevicePtr structure )
-        : CDevice(manager,device,structure)
-        , CDeviceLWI(manager,device,structure)
-        , CDeviceLOAD(manager,device,structure)
+    public:
+        /// Convenience type for a shared pointer to self
+        typedef boost::shared_ptr<CDeviceLWI_Load> DevicePtr;
+        
+        /// Constructor which takes a manager, identifier, and internal structure
+        CDeviceLWI_Load( CPhysicalDeviceManager & manager, Identifier device,
+                         IDeviceStructure::DevicePtr structure )
+                : CDevice(manager,device,structure)
+                , CDeviceLWI(manager,device,structure)
+                , CDeviceLOAD(manager,device,structure)
         {}
-    
-    /// Virtual destructor for derived classes
-    virtual ~CDeviceLWI_Load() {}
+        
+        /// Virtual destructor for derived classes
+        virtual ~CDeviceLWI_Load() {}
 };
 
 /// Solar panels for the LWI project
 class CDeviceLWI_PV
-    : public CDeviceLWI
-    , public CDeviceDRER
+        : public CDeviceLWI
+        , public CDeviceDRER
 {
-public:
-    /// Convenience type for a shared pointer to self
-    typedef boost::shared_ptr<CDeviceLWI_PV> DevicePtr;
-    
-    /// Constructor which takes a manager, identifier, and internal structure
-    CDeviceLWI_PV( CPhysicalDeviceManager & manager, Identifier device,
-        IDeviceStructure::DevicePtr structure )
-        : CDevice(manager,device,structure)
-        , CDeviceLWI(manager,device,structure)
-        , CDeviceDRER(manager,device,structure)
+    public:
+        /// Convenience type for a shared pointer to self
+        typedef boost::shared_ptr<CDeviceLWI_PV> DevicePtr;
+        
+        /// Constructor which takes a manager, identifier, and internal structure
+        CDeviceLWI_PV( CPhysicalDeviceManager & manager, Identifier device,
+                       IDeviceStructure::DevicePtr structure )
+                : CDevice(manager,device,structure)
+                , CDeviceLWI(manager,device,structure)
+                , CDeviceDRER(manager,device,structure)
         {}
-    
-    /// Virtual destructor for derived classes
-    virtual ~CDeviceLWI_PV() {}
+        
+        /// Virtual destructor for derived classes
+        virtual ~CDeviceLWI_PV() {}
 };
 
 } // namespace device

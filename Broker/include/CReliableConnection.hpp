@@ -44,81 +44,83 @@
 
 #include <iomanip>
 
-namespace freedm {
-    namespace broker {
+namespace freedm
+{
+namespace broker
+{
 
 class CConnectionManager;
 
 /// Represents a single connection to from a client.
 class CReliableConnection
-    : public boost::enable_shared_from_this<CReliableConnection>,
-      private boost::noncopyable
+        : public boost::enable_shared_from_this<CReliableConnection>,
+        private boost::noncopyable
 {
-public:
-    /// Typedef for the connection pointer
-    typedef boost::shared_ptr<CReliableConnection> ConnectionPtr;
-
-    /// Construct a CConnection with the given io_service.
-    explicit CReliableConnection(boost::asio::io_service& p_ioService,
-            CConnectionManager& p_manager, CDispatcher& p_dispatch,
-            std::string uuid);
-
-    /// Get the socket associated with the CConnection.
-    boost::asio::ip::udp::socket& GetSocket();
-
-    /// Start the first asynchronous operation for the CConnection.
-    virtual void Start() = 0;
-
-    /// Stop all asynchronous operations associated with the CConnection.
-    virtual void Stop() = 0;
-
-    /// Get associated UUID
-    std::string GetUUID() { return m_uuid; };
-
-    /// Get Connection Manager
-    CConnectionManager& GetConnectionManager() { return m_connManager; };
-
-    /// Get the dispatcher
-    CDispatcher& GetDispatcher() { return m_dispatch; };
-
-    /// Get the out window size
-    unsigned int GetWindowSize() { return WINDOWSIZE; };
+    public:
+        /// Typedef for the connection pointer
+        typedef boost::shared_ptr<CReliableConnection> ConnectionPtr;
+        
+        /// Construct a CConnection with the given io_service.
+        explicit CReliableConnection(boost::asio::io_service& p_ioService,
+                                     CConnectionManager& p_manager, CDispatcher& p_dispatch,
+                                     std::string uuid);
+                                     
+        /// Get the socket associated with the CConnection.
+        boost::asio::ip::udp::socket& GetSocket();
+        
+        /// Start the first asynchronous operation for the CConnection.
+        virtual void Start() = 0;
+        
+        /// Stop all asynchronous operations associated with the CConnection.
+        virtual void Stop() = 0;
+        
+        /// Get associated UUID
+        std::string GetUUID() { return m_uuid; };
+        
+        /// Get Connection Manager
+        CConnectionManager& GetConnectionManager() { return m_connManager; };
+        
+        /// Get the dispatcher
+        CDispatcher& GetDispatcher() { return m_dispatch; };
+        
+        /// Get the out window size
+        unsigned int GetWindowSize() { return WINDOWSIZE; };
+        
+        /// Get the sequencing Modulo
+        unsigned int GetSequenceModulo() { return SEQUENCEMODULO; }
+        
+        /// Set the connection reliability for DCUSTOMNETWORK
+        void SetReliability(int r) { m_reliability = r; };
+        
+        /// Get the connection reliability for DCUSTOMNETWORK
+        int GetReliability() { return m_reliability; };
+        
+    private:
     
-    /// Get the sequencing Modulo
-    unsigned int GetSequenceModulo() { return SEQUENCEMODULO; }
-
-    /// Set the connection reliability for DCUSTOMNETWORK
-    void SetReliability(int r) { m_reliability = r; };
-    
-    /// Get the connection reliability for DCUSTOMNETWORK
-    int GetReliability() { return m_reliability; };
-
-private:
-
-    /// Outgoing message Queue, window size
-    static const unsigned int WINDOWSIZE = 5;
-
-    /// Sequence Modulo
-    static const unsigned int SEQUENCEMODULO = 16;
-
-    /// Socket for the CConnection.
-    boost::asio::ip::udp::socket m_socket;
-
-    /// The manager for this CConnection.
-    CConnectionManager& m_connManager;
-
-    /// The dispatcher used to process the incoming request.
-    CDispatcher& m_dispatch;
- 
-    /// The UUID of the remote endpoint for the connection
-    std::string m_uuid;
-
-    /// The reliability of the connection (FOR -DCUSTOMNETWORK)
-    int m_reliability;
+        /// Outgoing message Queue, window size
+        static const unsigned int WINDOWSIZE = 5;
+        
+        /// Sequence Modulo
+        static const unsigned int SEQUENCEMODULO = 16;
+        
+        /// Socket for the CConnection.
+        boost::asio::ip::udp::socket m_socket;
+        
+        /// The manager for this CConnection.
+        CConnectionManager& m_connManager;
+        
+        /// The dispatcher used to process the incoming request.
+        CDispatcher& m_dispatch;
+        
+        /// The UUID of the remote endpoint for the connection
+        std::string m_uuid;
+        
+        /// The reliability of the connection (FOR -DCUSTOMNETWORK)
+        int m_reliability;
 };
 
 
-    } // namespace broker
+} // namespace broker
 } // namespace freedm
 
 #endif // CCONNECTION_HPP

@@ -34,13 +34,16 @@
 
 #include "IPhysicalDevice.hpp"
 
-namespace freedm {
-namespace broker {
+namespace freedm
+{
+namespace broker
+{
 
 // forward declaration of device manager
 class CPhysicalDeviceManager;
 
-namespace device {
+namespace device
+{
 
 ////////////////////////////////////////////////////////////////////////////////
 /// device_cast<TargetType>( ObjectType )
@@ -57,56 +60,56 @@ boost::shared_ptr<TargetType> device_cast( ObjectType object )
 
 /// Physical device with implementation delegated to private member
 class CDevice
-    : public IDeviceGet
-    , public IDeviceSet
-    , private boost::noncopyable
+        : public IDeviceGet
+        , public IDeviceSet
+        , private boost::noncopyable
 {
-public:
-    /// Convenience type for a shared pointer to self
-    typedef boost::shared_ptr<CDevice> DevicePtr;
-    
-    /// Constructor which takes a manager, identifier, and internal structure
-    CDevice( CPhysicalDeviceManager & manager, Identifier device,
-        IDeviceStructure::DevicePtr structure );
-    
-    /// Virtual destructor for derived classes
-    virtual ~CDevice() {}
-    
-    /// Gets the setting of some key from the structure
-    virtual SettingValue Get( const SettingKey & key );
-    
-    /// Sets the value of some key in the structure
-    virtual void Set( const SettingKey & key, const SettingValue & value );
-    
-    /// Gets the device manager for the device
-    CPhysicalDeviceManager & GetManager();
-    
-    /// Gets the device manager for the device
-    const CPhysicalDeviceManager & GetManager() const;
-    
-    /// Acquires the mutex
-    void Lock();
-    
-    /// Releases a mutex lock
-    void Unlock();
-    
-    /// Tries to acquire the mutex
-    bool TryLock();
-    
-    /// Gets the device identifier
-    const Identifier & GetID() const;
-protected:
-    /// Device manager that handles the device
-    CPhysicalDeviceManager & m_manager;
-    
-    /// Mutex to protect the device from other threads
-    mutable boost::mutex m_mutex;
-    
-    /// Unique identifier for the device
-    Identifier m_device;
-    
-    /// Structure that handles the device data
-    IDeviceStructure::DevicePtr m_structure;
+    public:
+        /// Convenience type for a shared pointer to self
+        typedef boost::shared_ptr<CDevice> DevicePtr;
+        
+        /// Constructor which takes a manager, identifier, and internal structure
+        CDevice( CPhysicalDeviceManager & manager, Identifier device,
+                 IDeviceStructure::DevicePtr structure );
+                 
+        /// Virtual destructor for derived classes
+        virtual ~CDevice() {}
+        
+        /// Gets the setting of some key from the structure
+        virtual SettingValue Get( const SettingKey & key );
+        
+        /// Sets the value of some key in the structure
+        virtual void Set( const SettingKey & key, const SettingValue & value );
+        
+        /// Gets the device manager for the device
+        CPhysicalDeviceManager & GetManager();
+        
+        /// Gets the device manager for the device
+        const CPhysicalDeviceManager & GetManager() const;
+        
+        /// Acquires the mutex
+        void Lock();
+        
+        /// Releases a mutex lock
+        void Unlock();
+        
+        /// Tries to acquire the mutex
+        bool TryLock();
+        
+        /// Gets the device identifier
+        const Identifier & GetID() const;
+    protected:
+        /// Device manager that handles the device
+        CPhysicalDeviceManager & m_manager;
+        
+        /// Mutex to protect the device from other threads
+        mutable boost::mutex m_mutex;
+        
+        /// Unique identifier for the device
+        Identifier m_device;
+        
+        /// Structure that handles the device data
+        IDeviceStructure::DevicePtr m_structure;
 };
 
 } // namespace device

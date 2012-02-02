@@ -47,61 +47,63 @@
 
 #include <iomanip>
 
-namespace freedm {
-    namespace broker {
+namespace freedm
+{
+namespace broker
+{
 
 class CConnectionManager;
 
 /// Represents a single CListner from a client.
 class CListener
-    : public CReliableConnection
+        : public CReliableConnection
 {
 
-public:
-    /// The Listener Shared pointer type
-    typedef boost::shared_ptr<CListener> ConnectionPtr;
-    /// Construct a CConnection with the given io_service.
-    explicit CListener(boost::asio::io_service& p_ioService,
-            CConnectionManager& p_manager, CDispatcher& p_dispatch,
-            std::string uuid);
-
-    /// Start the first asynchronous operation for the CConnection.
-    void Start();
-
-    /// Stop all asynchronous operations associated with the CConnection.
-    void Stop();
-
-    /// Get Remote UUID
-    std::string GetUUID() { return m_uuid; };
-
-private:
-    /// Responsible for writing acknowledgements to the stream.
-    void SendACK(std::string uuid, remotehost hostname, unsigned int sequenceno);
-
-    /// Handle completion of a read operation.
-    void HandleRead(const boost::system::error_code& e, std::size_t bytes_transferred);
-
-    /// Variable used for tracking the remote endpoint of incoming messages.
-    boost::asio::ip::udp::endpoint m_endpoint;
-
-    /// Buffer for incoming data.
-    boost::array<char, 8192> m_buffer;
-    
-    /// The incoming request.
-    CMessage m_message;
-
-    /// The UUID of the remote endpoint for the connection
-    std::string m_uuid;
-
-    /// The current sequence number (incoming channel only)
-    std::map<std::string,unsigned int> m_insequenceno;
-
-    /// Have I seen a sync for a connection?
-    std::map<std::string, bool> m_synched;   
+    public:
+        /// The Listener Shared pointer type
+        typedef boost::shared_ptr<CListener> ConnectionPtr;
+        /// Construct a CConnection with the given io_service.
+        explicit CListener(boost::asio::io_service& p_ioService,
+                           CConnectionManager& p_manager, CDispatcher& p_dispatch,
+                           std::string uuid);
+                           
+        /// Start the first asynchronous operation for the CConnection.
+        void Start();
+        
+        /// Stop all asynchronous operations associated with the CConnection.
+        void Stop();
+        
+        /// Get Remote UUID
+        std::string GetUUID() { return m_uuid; };
+        
+    private:
+        /// Responsible for writing acknowledgements to the stream.
+        void SendACK(std::string uuid, remotehost hostname, unsigned int sequenceno);
+        
+        /// Handle completion of a read operation.
+        void HandleRead(const boost::system::error_code& e, std::size_t bytes_transferred);
+        
+        /// Variable used for tracking the remote endpoint of incoming messages.
+        boost::asio::ip::udp::endpoint m_endpoint;
+        
+        /// Buffer for incoming data.
+        boost::array<char, 8192> m_buffer;
+        
+        /// The incoming request.
+        CMessage m_message;
+        
+        /// The UUID of the remote endpoint for the connection
+        std::string m_uuid;
+        
+        /// The current sequence number (incoming channel only)
+        std::map<std::string,unsigned int> m_insequenceno;
+        
+        /// Have I seen a sync for a connection?
+        std::map<std::string, bool> m_synched;
 };
 
 
-    } // namespace broker
+} // namespace broker
 } // namespace freedm
 
 #endif // CCONNECTION_HPP

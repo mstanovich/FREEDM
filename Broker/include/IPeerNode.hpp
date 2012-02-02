@@ -52,13 +52,14 @@
 //CREATE_EXTERN_STD_LOGS();
 
 
-namespace freedm {
+namespace freedm
+{
 typedef boost::shared_ptr<freedm::broker::CMessage> MessagePtr;
 typedef freedm::broker::CConnectionManager& ConnManagerPtr;
 /// Base interface for agents/broker modules
 class IPeerNode
-  : public boost::enable_shared_from_this<IPeerNode>
-  , private boost::noncopyable
+        : public boost::enable_shared_from_this<IPeerNode>
+        , private boost::noncopyable
 {
         //////////////////////////////////////////////////////////
         /// class IPeerNode
@@ -73,7 +74,7 @@ class IPeerNode
         /////////////////////////////////////////////////////////
     public:
         IPeerNode(std::string uuid, ConnManagerPtr connmgr,
-            boost::asio::io_service& ios, freedm::broker::CDispatcher& dispatch);
+                  boost::asio::io_service& ios, freedm::broker::CDispatcher& dispatch);
         /////////////////////////////////////////////////////////////
         /// @fn IPeerNode::GetStatus
         /// @description returns the status stored in the node as an

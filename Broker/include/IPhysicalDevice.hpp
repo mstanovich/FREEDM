@@ -30,9 +30,12 @@
 #include <string>
 #include <boost/shared_ptr.hpp>
 
-namespace freedm {
-namespace broker {
-namespace device {
+namespace freedm
+{
+namespace broker
+{
+namespace device
+{
 
 /// Type of the unique device identifier
 typedef std::string Identifier;
@@ -46,45 +49,45 @@ typedef double SettingValue;
 /// Defines the interface of the device get value function
 class IDeviceGet
 {
-public:
-    /// Virtual destructor for derived classes
-    virtual ~IDeviceGet() {}
-    
-    /// Handle the device get value operation.
-    virtual SettingValue Get( const SettingKey & key ) = 0;
+    public:
+        /// Virtual destructor for derived classes
+        virtual ~IDeviceGet() {}
+        
+        /// Handle the device get value operation.
+        virtual SettingValue Get( const SettingKey & key ) = 0;
 };
 
 /// Defines the interface of the device set value function
 class IDeviceSet
 {
-public:
-    /// Virtual destructor for derived classes
-    virtual ~IDeviceSet() {}
-    
-    /// Handle the device set operation.
-    virtual void Set( const SettingKey & key, const SettingValue & value ) = 0;
+    public:
+        /// Virtual destructor for derived classes
+        virtual ~IDeviceSet() {}
+        
+        /// Handle the device set operation.
+        virtual void Set( const SettingKey & key, const SettingValue & value ) = 0;
 };
 
 /// Defines the interface of the device implementation scheme
 class IDeviceStructure
-    : public IDeviceGet
-    , public IDeviceSet
+        : public IDeviceGet
+        , public IDeviceSet
 {
-public:
-    /// Convenience type for a shared pointer to self
-    typedef boost::shared_ptr<IDeviceStructure> DevicePtr;
-    
-    /// Virtual destructor for derived classes
-    virtual ~IDeviceStructure() {}
-    
-    /// Registers a device identifier with the structure
-    void Register( const Identifier & devid ) { m_device = devid; }
-    
-    /// Returns the device registered with the structure
-    Identifier GetDevice() const { return m_device; }
-private:
-    /// Identifies the device that owns the structure
-    Identifier m_device;
+    public:
+        /// Convenience type for a shared pointer to self
+        typedef boost::shared_ptr<IDeviceStructure> DevicePtr;
+        
+        /// Virtual destructor for derived classes
+        virtual ~IDeviceStructure() {}
+        
+        /// Registers a device identifier with the structure
+        void Register( const Identifier & devid ) { m_device = devid; }
+        
+        /// Returns the device registered with the structure
+        Identifier GetDevice() const { return m_device; }
+    private:
+        /// Identifies the device that owns the structure
+        Identifier m_device;
 };
 
 } // namespace device

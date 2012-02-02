@@ -46,8 +46,10 @@
 
 CREATE_EXTERN_STD_LOGS()
 
-namespace freedm {
-    namespace broker{
+namespace freedm
+{
+namespace broker
+{
 
 class CClientRTDS;
 ////////////////////////////////////////////////////////////////////////////////
@@ -63,146 +65,146 @@ class CClientRTDS;
 ////////////////////////////////////////////////////////////////////////////////
 class CTableRTDS
 {
-public:
-    ////////////////////////////////////////////////////////////////////////////
-    /// CTableRTDS( const string &, const string & )
-    ///
-    /// @description
-    /// Creates an instance of CTableRTDS based on the passed XML file.
-    ///
-    /// @Shared_Memory
-    /// none
-    ///
-    /// @Error_Handling
-    /// Throws an exception if the XML input file has an incorrect format.
-    ///
-    /// @pre
-    /// p_xml has the correct format
-    ///
-    /// @post
-    /// m_data is allocated
-    ///
-    /// @param
-    /// p_xml is the filename of the XML input file
-    /// p_tag is the XML tag of the table specification
-    ///
-    /// @limitations
-    /// none
-    ///
-    /// @see CTableStructure::CTableStructure( const string &, const string & )
-    ///
-    ////////////////////////////////////////////////////////////////////////////
-    CTableRTDS( const std::string & p_xml, const std::string & p_tag );
-
-    ////////////////////////////////////////////////////////////////////////////
-    /// SetValue( const CDeviceKeyCoupled &, size_t, double )
-    ///
-    /// @description
-    /// Modifies the table entry that corresponds to the given device-key object.
-    ///
-    /// @Shared_Memory
-    /// m_data can be modified outside of the class
-    ///
-    /// @Error_Handling
-    /// Throws an exception if the passed SST index does not have access to
-    /// the given device key. This could be due to insufficient privilege
-    /// or an invalid device key.
-    ///
-    /// @pre
-    /// p_dkey exists as a table entry in m_structure
-    /// p_index has access to p_dkey in m_structure
-    ///
-    /// @post
-    /// m_mutex is obtained with unique access
-    /// one element of m_data is modified
-    ///
-    /// @param
-    /// p_dkey is used to determine the table entry to modify
-    /// p_value is the new value for the table entry
-    ///
-    /// @limitations
-    /// This function assumes CTableStructure checks against indexes larger
-    /// than the stored data size. If a segmentation fault occurs, this
-    /// assumption has been violated.
-    ///
-    ////////////////////////////////////////////////////////////////////////////
-    void SetValue( const CDeviceKeyCoupled & p_dkey, double p_value );
-    
-    ////////////////////////////////////////////////////////////////////////////
-    /// GetValue( const CDeviceKeyCoupled &, size_t )
-    ///
-    /// @description
-    /// Returns the table entry that corresponds to the given device and key combo.
-    ///
-    /// @Shared_Memory
-    /// m_data can be modified outside of the class
-    ///
-    /// @Error_Handling
-    /// Throws an exception if the passed SST index does not have access to
-    /// the given device key. This could be due to insufficient privilege
-    /// or an invalid device key.
-    ///
-    /// @pre
-    /// p_dkey exists as a table entry in m_structure
-    /// p_index has access to p_dkey in m_structure
-    ///
-    /// @post
-    /// m_mutex is obtained with shared access
-    ///
-    /// @param
-    /// p_dkey is the index for the value in the table
-    ///
-    /// @return
-    /// m_data element that corresponds to p_dkey
-    ///
-    /// @limitations
-    /// This function assumes CTableStructure checks against indexes larger
-    /// than the stored data size. If a segmentation fault occurs, this
-    /// assumption has been violated.
-    ///
-    ////////////////////////////////////////////////////////////////////////////
-    double GetValue( const CDeviceKeyCoupled & p_dkey);
-
-    ////////////////////////////////////////////////////////////////////////////
-    /// ~CTableRTDS
-    ///
-    /// @description
-    /// Safely destroys an instance of CTableRTDS.
-    ///
-    /// @Shared_Memory
-    /// none
-    ///
-    /// @Error_Handling
-    /// none
-    ///
-    /// @pre
-    /// none
-    ///
-    /// @post
-    /// m_data is deallocated
-    ///
-    /// @limitations
-    /// none
-    ///
-    ////////////////////////////////////////////////////////////////////////////
-    ~CTableRTDS();
-
-     friend class CClientRTDS;
-private: 
-    /// manages the XML specification
-    CTableStructure m_structure;
-    
-    /// read-write mutex for m_data
-    boost::shared_mutex m_mutex;
-    
-    /// actual values. Notice this is in float type
-    float * m_data;
-    
-    /// number of m_data elements
-    size_t m_length;
+    public:
+        ////////////////////////////////////////////////////////////////////////////
+        /// CTableRTDS( const string &, const string & )
+        ///
+        /// @description
+        /// Creates an instance of CTableRTDS based on the passed XML file.
+        ///
+        /// @Shared_Memory
+        /// none
+        ///
+        /// @Error_Handling
+        /// Throws an exception if the XML input file has an incorrect format.
+        ///
+        /// @pre
+        /// p_xml has the correct format
+        ///
+        /// @post
+        /// m_data is allocated
+        ///
+        /// @param
+        /// p_xml is the filename of the XML input file
+        /// p_tag is the XML tag of the table specification
+        ///
+        /// @limitations
+        /// none
+        ///
+        /// @see CTableStructure::CTableStructure( const string &, const string & )
+        ///
+        ////////////////////////////////////////////////////////////////////////////
+        CTableRTDS( const std::string & p_xml, const std::string & p_tag );
+        
+        ////////////////////////////////////////////////////////////////////////////
+        /// SetValue( const CDeviceKeyCoupled &, size_t, double )
+        ///
+        /// @description
+        /// Modifies the table entry that corresponds to the given device-key object.
+        ///
+        /// @Shared_Memory
+        /// m_data can be modified outside of the class
+        ///
+        /// @Error_Handling
+        /// Throws an exception if the passed SST index does not have access to
+        /// the given device key. This could be due to insufficient privilege
+        /// or an invalid device key.
+        ///
+        /// @pre
+        /// p_dkey exists as a table entry in m_structure
+        /// p_index has access to p_dkey in m_structure
+        ///
+        /// @post
+        /// m_mutex is obtained with unique access
+        /// one element of m_data is modified
+        ///
+        /// @param
+        /// p_dkey is used to determine the table entry to modify
+        /// p_value is the new value for the table entry
+        ///
+        /// @limitations
+        /// This function assumes CTableStructure checks against indexes larger
+        /// than the stored data size. If a segmentation fault occurs, this
+        /// assumption has been violated.
+        ///
+        ////////////////////////////////////////////////////////////////////////////
+        void SetValue( const CDeviceKeyCoupled & p_dkey, double p_value );
+        
+        ////////////////////////////////////////////////////////////////////////////
+        /// GetValue( const CDeviceKeyCoupled &, size_t )
+        ///
+        /// @description
+        /// Returns the table entry that corresponds to the given device and key combo.
+        ///
+        /// @Shared_Memory
+        /// m_data can be modified outside of the class
+        ///
+        /// @Error_Handling
+        /// Throws an exception if the passed SST index does not have access to
+        /// the given device key. This could be due to insufficient privilege
+        /// or an invalid device key.
+        ///
+        /// @pre
+        /// p_dkey exists as a table entry in m_structure
+        /// p_index has access to p_dkey in m_structure
+        ///
+        /// @post
+        /// m_mutex is obtained with shared access
+        ///
+        /// @param
+        /// p_dkey is the index for the value in the table
+        ///
+        /// @return
+        /// m_data element that corresponds to p_dkey
+        ///
+        /// @limitations
+        /// This function assumes CTableStructure checks against indexes larger
+        /// than the stored data size. If a segmentation fault occurs, this
+        /// assumption has been violated.
+        ///
+        ////////////////////////////////////////////////////////////////////////////
+        double GetValue( const CDeviceKeyCoupled & p_dkey);
+        
+        ////////////////////////////////////////////////////////////////////////////
+        /// ~CTableRTDS
+        ///
+        /// @description
+        /// Safely destroys an instance of CTableRTDS.
+        ///
+        /// @Shared_Memory
+        /// none
+        ///
+        /// @Error_Handling
+        /// none
+        ///
+        /// @pre
+        /// none
+        ///
+        /// @post
+        /// m_data is deallocated
+        ///
+        /// @limitations
+        /// none
+        ///
+        ////////////////////////////////////////////////////////////////////////////
+        ~CTableRTDS();
+        
+        friend class CClientRTDS;
+    private:
+        /// manages the XML specification
+        CTableStructure m_structure;
+        
+        /// read-write mutex for m_data
+        boost::shared_mutex m_mutex;
+        
+        /// actual values. Notice this is in float type
+        float * m_data;
+        
+        /// number of m_data elements
+        size_t m_length;
 };
 
-    }//namespace broker
+}//namespace broker
 } // namespace freedm
 
 #endif // C_TABLE_RTDS_HPP

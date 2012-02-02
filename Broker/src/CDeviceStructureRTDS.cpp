@@ -27,9 +27,12 @@
 
 #include "CDeviceStructureRTDS.hpp"
 
-namespace freedm {
-namespace broker {
-namespace device {
+namespace freedm
+{
+namespace broker
+{
+namespace device
+{
 
 ///////////////////////////////////////////////////////////////////////////////
 /// @fn CDeviceStructureRTDS
@@ -37,7 +40,7 @@ namespace device {
 /// @param client The client that connects to FPGA interface
 ///////////////////////////////////////////////////////////////////////////////
 CDeviceStructureRTDS::CDeviceStructureRTDS( CClientRTDS::RTDSPointer client )
-    : m_client(client)
+        : m_client(client)
 {
     // skip
 }
@@ -50,14 +53,12 @@ CDeviceStructureRTDS::CDeviceStructureRTDS( CClientRTDS::RTDSPointer client )
 ///////////////////////////////////////////////////////////////////////////////
 SettingValue CDeviceStructureRTDS::Get( const SettingKey & key )
 {
-    
     return m_client->Get(GetDevice(), key);
-    
 }
 
 ///////////////////////////////////////////////////////////////////////////////
 /// @fn Set( const SettingKey &, const SettingValue & )
-/// @brief Sets the value of some key to a new value in the command table 
+/// @brief Sets the value of some key to a new value in the command table
 /// @param key The key to change.
 /// @param value The value to set the key to.
 ///////////////////////////////////////////////////////////////////////////////

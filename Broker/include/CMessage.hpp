@@ -46,133 +46,134 @@ using boost::property_tree::ptree;
 #include "logger.hpp"
 CREATE_EXTERN_STD_LOGS()
 
-namespace freedm {
-namespace broker {
+namespace freedm
+{
+namespace broker
+{
 
 /// A request received from a client.
 class CMessage
 {
-public:
-    /// Status codes are modeled after HTTP/1.0 will add/remove as necessary.
-    /// The status of the reply.
-    enum StatusType
-    {
-        OK = 200,
-        Created = 201,
-        Accepted = 202,
-        NoContent = 204,
-        MultipleChoices = 300,
-        MovedPermanently = 301,
-        MovedTemporarily = 302,
-        NotModified = 304,
-        BadRequest = 400,
-        Unauthorized = 401,
-        Forbidden = 403,
-        NotFound = 404,
-        InternalServerError = 500,
-        NotImplemented = 501,
-        BadGateway = 502,
-        ServiceUnavailable = 503
-    };
-
-    /// Accessor for uuid
-    std::string GetSourceUUID() { return m_srcUUID; };
-    
-    /// Accessor for hostname
-    remotehost GetSourceHostname() { return m_remotehost; };
-    
-    /// Accessor for sequenceno
-    unsigned int GetSequenceNumber() { return m_sequenceno; };
-
-    /// Accessor for status
-    StatusType GetStatus() { return m_status; };
-    
-    /// Accessor for submessages
-    ptree& GetSubMessages() { return m_submessages; };
-
-    /// Setter for uuid
-    void SetSourceUUID(std::string uuid) { m_srcUUID = uuid; };
-    
-    /// Setter for hostname
-    void SetSourceHostname(remotehost hostname) { m_remotehost = hostname; };
-
-    /// Setter for sequenceno
-    void SetSequenceNumber(unsigned int sequenceno) { m_sequenceno = sequenceno; };
-
-    /// Setter for status
-    void SetStatus(StatusType status) { m_status = status; };
-
-    /// Contains the source node's information
-    std::string m_srcUUID;
-
-    /// Status of the message
-    StatusType  m_status;
-
-    /// Contains all the submessages as handled by client algorithms
-    ptree       m_submessages;
-
-    /// Deconstruct the CMessage
-    virtual ~CMessage() { };
-
-    /// Initialize a new CMessage with a status type.
-    CMessage( CMessage::StatusType p_stat = CMessage::OK ) :
-        m_status ( p_stat )
-    {
-        Logger::Debug << __PRETTY_FUNCTION__ << std::endl;
-    };
-
-    /// Copy Constructor
-    CMessage( const CMessage &p_m ) :
-        m_srcUUID( p_m.m_srcUUID ),
-        m_status( p_m.m_status ),
-        m_submessages( p_m.m_submessages ),
-        m_remotehost( p_m.m_remotehost ),
-        m_sequenceno( p_m.m_sequenceno )
-    {
-        Logger::Debug << __PRETTY_FUNCTION__ << std::endl;
-    };
-
-    /// Cmessage Equals operator
-    CMessage& operator = ( const CMessage &p_m )
-    {
-        this->m_srcUUID = p_m.m_srcUUID;
-        this->m_status = p_m.m_status;
-        this->m_submessages = p_m.m_submessages;
-        this->m_remotehost = p_m.m_remotehost;
-        this->m_sequenceno = p_m.m_sequenceno;
-        return *this;
-    }
-    
-    /// Parse CMessage from string.
-    virtual bool Load( std::istream &p_is )
+    public:
+        /// Status codes are modeled after HTTP/1.0 will add/remove as necessary.
+        /// The status of the reply.
+        enum StatusType
+        {
+            OK = 200,
+            Created = 201,
+            Accepted = 202,
+            NoContent = 204,
+            MultipleChoices = 300,
+            MovedPermanently = 301,
+            MovedTemporarily = 302,
+            NotModified = 304,
+            BadRequest = 400,
+            Unauthorized = 401,
+            Forbidden = 403,
+            NotFound = 404,
+            InternalServerError = 500,
+            NotImplemented = 501,
+            BadGateway = 502,
+            ServiceUnavailable = 503
+        };
+        
+        /// Accessor for uuid
+        std::string GetSourceUUID() { return m_srcUUID; };
+        
+        /// Accessor for hostname
+        remotehost GetSourceHostname() { return m_remotehost; };
+        
+        /// Accessor for sequenceno
+        unsigned int GetSequenceNumber() { return m_sequenceno; };
+        
+        /// Accessor for status
+        StatusType GetStatus() { return m_status; };
+        
+        /// Accessor for submessages
+        ptree& GetSubMessages() { return m_submessages; };
+        
+        /// Setter for uuid
+        void SetSourceUUID(std::string uuid) { m_srcUUID = uuid; };
+        
+        /// Setter for hostname
+        void SetSourceHostname(remotehost hostname) { m_remotehost = hostname; };
+        
+        /// Setter for sequenceno
+        void SetSequenceNumber(unsigned int sequenceno) { m_sequenceno = sequenceno; };
+        
+        /// Setter for status
+        void SetStatus(StatusType status) { m_status = status; };
+        
+        /// Contains the source node's information
+        std::string m_srcUUID;
+        
+        /// Status of the message
+        StatusType  m_status;
+        
+        /// Contains all the submessages as handled by client algorithms
+        ptree       m_submessages;
+        
+        /// Deconstruct the CMessage
+        virtual ~CMessage() { };
+        
+        /// Initialize a new CMessage with a status type.
+        CMessage( CMessage::StatusType p_stat = CMessage::OK ) :
+                m_status ( p_stat )
+        {
+            Logger::Debug << __PRETTY_FUNCTION__ << std::endl;
+        };
+        
+        /// Copy Constructor
+        CMessage( const CMessage &p_m ) :
+                m_srcUUID( p_m.m_srcUUID ),
+                m_status( p_m.m_status ),
+                m_submessages( p_m.m_submessages ),
+                m_remotehost( p_m.m_remotehost ),
+                m_sequenceno( p_m.m_sequenceno )
+        {
+            Logger::Debug << __PRETTY_FUNCTION__ << std::endl;
+        };
+        
+        /// Cmessage Equals operator
+        CMessage& operator = ( const CMessage &p_m )
+        {
+            this->m_srcUUID = p_m.m_srcUUID;
+            this->m_status = p_m.m_status;
+            this->m_submessages = p_m.m_submessages;
+            this->m_remotehost = p_m.m_remotehost;
+            this->m_sequenceno = p_m.m_sequenceno;
+            return *this;
+        }
+        
+        /// Parse CMessage from string.
+        virtual bool Load( std::istream &p_is )
         throw ( boost::property_tree::file_parser_error );
-    
-    /// Put CMessage to a stream.
-    virtual void Save( std::ostream &p_os );
-
-    /// A Generic reply CMessage
-    static CMessage StockReply( StatusType p_status )
-    {
-        Logger::Debug << __PRETTY_FUNCTION__ << std::endl;
-        CMessage reply_;
-        reply_.m_status = p_status;
-
-        return reply_;
-    }
-
-    /// Implicit conversion operator
-    virtual operator ptree ();
-
-    /// A way to load a CMessage from a property tree.
-    explicit CMessage( const ptree &pt );
-   
-private: 
-    /// Contains the source node's hostname
-    remotehost m_remotehost;
-
-    /// Contains the sequence number for the sending node
-    unsigned int m_sequenceno;
-
+        
+        /// Put CMessage to a stream.
+        virtual void Save( std::ostream &p_os );
+        
+        /// A Generic reply CMessage
+        static CMessage StockReply( StatusType p_status )
+        {
+            Logger::Debug << __PRETTY_FUNCTION__ << std::endl;
+            CMessage reply_;
+            reply_.m_status = p_status;
+            return reply_;
+        }
+        
+        /// Implicit conversion operator
+        virtual operator ptree ();
+        
+        /// A way to load a CMessage from a property tree.
+        explicit CMessage( const ptree &pt );
+        
+    private:
+        /// Contains the source node's hostname
+        remotehost m_remotehost;
+        
+        /// Contains the sequence number for the sending node
+        unsigned int m_sequenceno;
+        
 };
 
 } // namespace broker

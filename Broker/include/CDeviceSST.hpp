@@ -10,8 +10,8 @@
 /// @project        FREEDM DGI
 ///
 /// @description    Physical device class for SST.
-///                 It could be useful to have this definition to incorporate 
-///	            "additional properties" an SST could have in future
+///                 It could be useful to have this definition to incorporate
+///             "additional properties" an SST could have in future
 ///
 /// @license
 /// These source code files were created at the Missouri University of Science
@@ -35,30 +35,33 @@
 
 #include "CDevice.hpp"
 
-namespace freedm {
-namespace broker {
+namespace freedm
+{
+namespace broker
+{
 
 // forward declaration of device manager
 class CPhysicalDeviceManager;
 
-namespace device {
+namespace device
+{
 
 /// Implementation of distributed renewable energy resources
 class CDeviceSST
-    : public virtual CDevice
+        : public virtual CDevice
 {
-public:
-    /// Convenience type for a shared pointer to self
-    typedef boost::shared_ptr<CDeviceSST> DevicePtr;
-    
-    /// Constructor which takes a manager, identifier, and internal structure
-    CDeviceSST( CPhysicalDeviceManager & manager, Identifier device,
-        IDeviceStructure::DevicePtr structure )
-        : CDevice(manager,device,structure)
+    public:
+        /// Convenience type for a shared pointer to self
+        typedef boost::shared_ptr<CDeviceSST> DevicePtr;
+        
+        /// Constructor which takes a manager, identifier, and internal structure
+        CDeviceSST( CPhysicalDeviceManager & manager, Identifier device,
+                    IDeviceStructure::DevicePtr structure )
+                : CDevice(manager,device,structure)
         {}
-    
-    /// Virtual destructor for derived classes
-    virtual ~CDeviceSST() {}
+        
+        /// Virtual destructor for derived classes
+        virtual ~CDeviceSST() {}
 };
 
 } // namespace device

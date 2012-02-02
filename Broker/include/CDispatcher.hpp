@@ -24,11 +24,11 @@
 /// @license
 /// These source code files were created at as part of the
 /// FREEDM DGI Subthrust, and are
-/// intended for use in teaching or research.  They may be 
+/// intended for use in teaching or research.  They may be
 /// freely copied, modified and redistributed as long
 /// as modified versions are clearly marked as such and
 /// this notice is not removed.
-/// 
+///
 /// Neither the authors nor the FREEDM Project nor the
 /// National Science Foundation
 /// make any warranty, express or implied, nor assumes
@@ -36,8 +36,8 @@
 /// completeness or usefulness of these codes or any
 /// information distributed with these codes.
 ///
-/// Suggested modifications or questions about these codes 
-/// can be directed to Dr. Bruce McMillin, Department of 
+/// Suggested modifications or questions about these codes
+/// can be directed to Dr. Bruce McMillin, Department of
 /// Computer Science, Missouri University of Science and
 /// Technology, Rolla, MO  65409 (ff@mst.edu).
 ///
@@ -55,44 +55,46 @@
 #include <boost/property_tree/ptree.hpp>
 using boost::property_tree::ptree;
 
-namespace freedm {
-    namespace broker {
+namespace freedm
+{
+namespace broker
+{
 
 class CMessage;
 
 /// Handles applying read and write handlers to incoming messages
 class CDispatcher
-  : private boost::noncopyable
+        : private boost::noncopyable
 {
-public:
-    /// Constructor for the dispatcher
-    CDispatcher();
-
-    /// Called upon incoming message
-    void HandleRequest( CMessage msg );
-
-    /// Called prior to sending a message
-    void HandleWrite( ptree &p_mesg );
-
-    /// Registers a handler that will be called with HandleRequest
-    void RegisterReadHandler( const std::string &p_type,
-            IReadHandler *p_handler );
-
-    /// Registers a handler that will be called with HandleWrite
-    void RegisterWriteHandler( const std::string &p_type,
-            IWriteHandler *p_handler );
-private:
-    /// All the registered read handlers.
-    std::map< const std::string, IReadHandler *> m_readHandlers;
-
-    /// All the registered write handlers.
-    std::map< const std::string, IWriteHandler *> m_writeHandlers;
- 
-
-    /// Mutexes for protecting the handler maps above
-    boost::mutex m_rMutex,
-                 m_wMutex;
-
+    public:
+        /// Constructor for the dispatcher
+        CDispatcher();
+        
+        /// Called upon incoming message
+        void HandleRequest( CMessage msg );
+        
+        /// Called prior to sending a message
+        void HandleWrite( ptree &p_mesg );
+        
+        /// Registers a handler that will be called with HandleRequest
+        void RegisterReadHandler( const std::string &p_type,
+                                  IReadHandler *p_handler );
+                                  
+        /// Registers a handler that will be called with HandleWrite
+        void RegisterWriteHandler( const std::string &p_type,
+                                   IWriteHandler *p_handler );
+    private:
+        /// All the registered read handlers.
+        std::map< const std::string, IReadHandler *> m_readHandlers;
+        
+        /// All the registered write handlers.
+        std::map< const std::string, IWriteHandler *> m_writeHandlers;
+        
+        
+        /// Mutexes for protecting the handler maps above
+        boost::mutex m_rMutex,
+        m_wMutex;
+        
 };
 
 } // namespace broker

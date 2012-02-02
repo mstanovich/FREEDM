@@ -27,9 +27,12 @@
 
 #include "CDeviceStructureGeneric.hpp"
 
-namespace freedm {
-namespace broker {
-namespace device {
+namespace freedm
+{
+namespace broker
+{
+namespace device
+{
 
 ////////////////////////////////////////////////////////////////////////////////
 /// Get( const SettingKey & )
@@ -40,8 +43,10 @@ namespace device {
 SettingValue CDeviceStructureGeneric::Get( const SettingKey & key )
 {
     std::map<SettingKey,SettingValue>::iterator ri = m_register.find(key);
-    if(ri != m_register.end())
+    
+    if (ri != m_register.end())
         return ri->second;
+        
     return 0.0;
 }
 

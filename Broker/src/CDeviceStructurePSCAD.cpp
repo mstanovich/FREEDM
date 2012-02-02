@@ -27,9 +27,12 @@
 
 #include "CDeviceStructurePSCAD.hpp"
 
-namespace freedm {
-namespace broker {
-namespace device {
+namespace freedm
+{
+namespace broker
+{
+namespace device
+{
 
 ///////////////////////////////////////////////////////////////////////////////
 /// @fn CDeviceStructurePSCAD
@@ -37,7 +40,7 @@ namespace device {
 /// @param client The line client that connects to PSCAD interface
 ///////////////////////////////////////////////////////////////////////////////
 CDeviceStructurePSCAD::CDeviceStructurePSCAD( CLineClient::TPointer client )
-    : m_client(client)
+        : m_client(client)
 {
     // skip
 }

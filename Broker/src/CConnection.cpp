@@ -10,16 +10,16 @@
 ///
 /// @project   FREEDM DGI
 ///
-/// @description 
+/// @description
 ///
 /// @license
 /// These source code files were created at as part of the
 /// FREEDM DGI Subthrust, and are
-/// intended for use in teaching or research.  They may be 
+/// intended for use in teaching or research.  They may be
 /// freely copied, modified and redistributed as long
 /// as modified versions are clearly marked as such and
 /// this notice is not removed.
-/// 
+///
 /// Neither the authors nor the FREEDM Project nor the
 /// National Science Foundation
 /// make any warranty, express or implied, nor assumes
@@ -27,8 +27,8 @@
 /// completeness or usefulness of these codes or any
 /// information distributed with these codes.
 ///
-/// Suggested modifications or questions about these codes 
-/// can be directed to Dr. Bruce McMillin, Department of 
+/// Suggested modifications or questions about these codes
+/// can be directed to Dr. Bruce McMillin, Department of
 /// Computer Science, Missouri University of Science and
 /// Technology, Rolla, MO  65409 (ff@mst.edu).
 ////////////////////////////////////////////////////////////////////
@@ -47,8 +47,10 @@
 #include <boost/property_tree/ptree.hpp>
 using boost::property_tree::ptree;
 
-namespace freedm {
-    namespace broker {
+namespace freedm
+{
+namespace broker
+{
 ///////////////////////////////////////////////////////////////////////////////
 /// @fn CConnection::CConnection
 /// @description Constructor for the CConnection object. Since the change to
@@ -58,14 +60,14 @@ namespace freedm {
 /// @post A new CConnection object is initialized.
 /// @param p_ioService The socket to use for the connection.
 /// @param p_manager The related connection manager that tracks this object.
-/// @param p_dispatch The dispatcher responsible for applying read/write 
+/// @param p_dispatch The dispatcher responsible for applying read/write
 ///   handlers to messages.
 /// @param uuid The uuid this node connects to, or what listener.
 ///////////////////////////////////////////////////////////////////////////////
 CConnection::CConnection(boost::asio::io_service& p_ioService,
-  CConnectionManager& p_manager, CDispatcher& p_dispatch, std::string uuid)
-  : CReliableConnection(p_ioService,p_manager,p_dispatch,uuid),
-    m_timeout( p_ioService)
+                         CConnectionManager& p_manager, CDispatcher& p_dispatch, std::string uuid)
+        : CReliableConnection(p_ioService,p_manager,p_dispatch,uuid),
+        m_timeout( p_ioService)
 {
     Logger::Debug << __PRETTY_FUNCTION__ << std::endl;
     m_outsequenceno = 0;
@@ -100,7 +102,7 @@ void CConnection::Stop()
     m_timeout.cancel();
     GetSocket().close();
 }
- 
+
 ///////////////////////////////////////////////////////////////////////////////
 /// @fn CConnection::Send
 /// @description Given a message and wether or not it should be sequenced,
@@ -119,55 +121,54 @@ void CConnection::Stop()
 void CConnection::Send(CMessage p_mesg, bool sequence)
 {
     Logger::Debug << __PRETTY_FUNCTION__ << std::endl;
-
-    #ifdef DATAGRAM
+#ifdef DATAGRAM
     sequence = false;
-    #endif
-
+#endif
     //Make a call to the dispatcher to sign the messages
     //With a bunch of shiny stuff.
     ptree x = static_cast<ptree>(p_mesg);
     unsigned int msgseq;
-
-    //m_dispatch.HandleWrite(x);  
-
+    //m_dispatch.HandleWrite(x);
     CMessage outmsg(x);
-
+    
     // Sign the message with the hostname, uuid, and squencenumber
-    if(sequence == true)
+    if (sequence == true)
     {
-        if(m_synched == false)
+        if (m_synched == false)
         {
             m_synched = true;
             SendSYN();
         }
+        
         msgseq = m_outsequenceno;
         outmsg.SetSequenceNumber(msgseq);
         m_outsequenceno = (m_outsequenceno+1) % GetSequenceModulo();
     }
-    outmsg.SetSourceUUID(GetConnectionManager().GetUUID()); 
+    
+    outmsg.SetSourceUUID(GetConnectionManager().GetUUID());
     outmsg.SetSourceHostname(GetConnectionManager().GetHostname());
-
-    if(sequence == true)
+    
+    if (sequence == true)
     {
         // If it isn't squenced then don't put it in the queue.
         m_queue.Push( QueueItem(msgseq,outmsg) );
     }
+    
     // Before, we would put it into a queue to be sent later, now we are going
     // to immediately write it to channel.
-
-    if(m_queue.size() <= GetWindowSize() || sequence == false)
+    
+    if (m_queue.size() <= GetWindowSize() || sequence == false)
     {
         // Only try to write to the socket if the window isn't already full.
         // Or it is an unsequenced message
-        
         HandleSend(outmsg);
-        if(sequence == true)
+        
+        if (sequence == true)
         {
             m_timeout.cancel();
             m_timeout.expires_from_now(boost::posix_time::milliseconds(500));
             m_timeout.async_wait(boost::bind(&CConnection::Resend,this,
-                boost::asio::placeholders::error));
+                                             boost::asio::placeholders::error));
         }
     }
 }
@@ -184,23 +185,22 @@ void CConnection::HandleSend(CMessage msg)
     Logger::Debug << __PRETTY_FUNCTION__ << std::endl;
     boost::tribool result_;
     boost::array<char, 8192>::iterator it_;
-
     it_ = m_buffer.begin();
     boost::tie( result_, it_ ) = Synthesize( msg, it_, m_buffer.end() - it_ );
-
-    #ifdef CUSTOMNETWORK
-    if((rand()%100) >= GetReliability()) 
+#ifdef CUSTOMNETWORK
+    
+    if ((rand()%100) >= GetReliability())
     {
         Logger::Info<<"Outgoing Packet Dropped ("<<GetReliability()
-                      <<") -> "<<GetUUID()<<std::endl;
+        <<") -> "<<GetUUID()<<std::endl;
         return;
     }
-    #endif
-
+    
+#endif
     GetSocket().async_send(boost::asio::buffer(m_buffer,
-            (it_ - m_buffer.begin()) * sizeof(char) ), 
-        boost::bind(&CConnection::HandleWrite, this,
-        boost::asio::placeholders::error));
+                           (it_ - m_buffer.begin()) * sizeof(char) ),
+                           boost::bind(&CConnection::HandleWrite, this,
+                                       boost::asio::placeholders::error));
 }
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -217,21 +217,22 @@ void CConnection::HandleSend(CMessage msg)
 void CConnection::Resend(const boost::system::error_code& err)
 {
     Logger::Debug << __PRETTY_FUNCTION__ << std::endl;
-    if(!err)
+    
+    if (!err)
     {
         Logger::Debug << "Firing Resend"<<std::endl;
-        if(!m_queue.IsEmpty())
+        
+        if (!m_queue.IsEmpty())
         {
             m_timeouts++;
             GetSocket().get_io_service().post(
-            boost::bind(&CConnection::HandleResend, this));
+                boost::bind(&CConnection::HandleResend, this));
             m_timeout.cancel();
             m_timeout.expires_from_now(boost::posix_time::milliseconds(100));
             m_timeout.async_wait(boost::bind(&CConnection::Resend,this,
-                boost::asio::placeholders::error));
+                                             boost::asio::placeholders::error));
         }
     }
-    
 }
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -245,12 +246,12 @@ void CConnection::HandleResend()
 {
     Logger::Debug << __PRETTY_FUNCTION__ << std::endl;
     SlidingWindow<QueueItem>::iterator sit;
-    sit = m_queue.begin();   
- 
-    for(unsigned int i=0; sit != m_queue.end() && i < GetWindowSize(); i++,sit++ )
+    sit = m_queue.begin();
+    
+    for (unsigned int i=0; sit != m_queue.end() && i < GetWindowSize(); i++,sit++ )
     {
         GetSocket().get_io_service().post(
-        boost::bind(&CConnection::HandleSend, this,(*sit).second));
+            boost::bind(&CConnection::HandleSend, this,(*sit).second));
     }
 }
 
@@ -282,12 +283,14 @@ void CConnection::SendSYN()
 void CConnection::RecieveACK(unsigned int sequenceno)
 {
     Logger::Debug << __PRETTY_FUNCTION__ << std::endl;
-    while(!m_queue.IsEmpty())
+    
+    while (!m_queue.IsEmpty())
     {
         unsigned int bounda = m_queue.front().first;
         unsigned int boundb = (m_queue.front().first+(GetWindowSize()))%GetSequenceModulo();
         Logger::Debug<<"ACK, bounda:"<<bounda<<" boundb:"<<boundb<<"input: "<<sequenceno<<std::endl;
-        if(bounda <= sequenceno || (sequenceno < boundb && boundb < bounda))
+        
+        if (bounda <= sequenceno || (sequenceno < boundb && boundb < bounda))
         {
             Logger::Debug<<"ACK handled for "<<m_queue.front().first<<std::endl;
             m_queue.pop();
@@ -298,7 +301,8 @@ void CConnection::RecieveACK(unsigned int sequenceno)
             break;
         }
     }
-    if(!m_queue.IsEmpty())
+    
+    if (!m_queue.IsEmpty())
     {
         GetSocket().get_io_service().post(
             boost::bind(&CConnection::HandleResend, this));
@@ -315,16 +319,17 @@ void CConnection::RecieveACK(unsigned int sequenceno)
 void CConnection::HandleWrite(const boost::system::error_code& e)
 {
     Logger::Debug << __PRETTY_FUNCTION__ << std::endl;
-
+    
     if (!e)
     {
         //All good
     }
+    
     if (e == boost::asio::error::operation_aborted)
     {
         GetConnectionManager().Stop(CConnection::ConnectionPtr(this));
     }
 }
 
-    } // namespace broker
+} // namespace broker
 } // namespace freedm

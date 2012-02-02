@@ -33,29 +33,32 @@
 #include "IPhysicalDevice.hpp"
 #include "CClientRTDS.hpp"
 
-namespace freedm {
-namespace broker {
-namespace device {
+namespace freedm
+{
+namespace broker
+{
+namespace device
+{
 
 
 /// this class will provide RTDS specific get and set functions
 class CDeviceStructureRTDS
-    : public IDeviceStructure
+        : public IDeviceStructure
 {
-public:
-    /// constructor which takes a RTDS client
-    CDeviceStructureRTDS( CClientRTDS::RTDSPointer client );
-    
-    /// Gets the setting of some key from state table
-    virtual SettingValue Get( const SettingKey & key );
-    
-    /// Sets the value of some key in the command table
-    virtual void Set( const SettingKey & key, const SettingValue & value );
-
-    //
-private:
-    /// Simulation RTDS client
-    CClientRTDS::RTDSPointer m_client;
+    public:
+        /// constructor which takes a RTDS client
+        CDeviceStructureRTDS( CClientRTDS::RTDSPointer client );
+        
+        /// Gets the setting of some key from state table
+        virtual SettingValue Get( const SettingKey & key );
+        
+        /// Sets the value of some key in the command table
+        virtual void Set( const SettingKey & key, const SettingValue & value );
+        
+        //
+    private:
+        /// Simulation RTDS client
+        CClientRTDS::RTDSPointer m_client;
 };
 
 } // namespace device
