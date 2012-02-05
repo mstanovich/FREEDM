@@ -72,9 +72,13 @@ bool CClientRTDS::Connect( const std::string p_hostname, const std::string p_por
     {
         throw boost::system::system_error(error);
     }
-    
-    return( it != end );
-    boost::thread thread2(&CClientRTDS::Run, this);
+
+    if ( it != end) {    
+        boost::thread thread2(&CClientRTDS::Run, this);
+        return true;
+    }
+    else
+        return false;
 }
 
 void CClientRTDS::Run()
@@ -126,6 +130,8 @@ void CClientRTDS::Run()
     //write to stateTable
     memcpy(m_stateTable.m_data, rx_buffer, rx_bufSize);
     Logger::Debug << "Client_RTDS - released writer mutex" << std::endl;
+    free(rx_buffer);
+    free(tx_buffer);
     m_GlobalTimer.async_wait( boost::bind(&CClientRTDS::Run, this));
 }
 
