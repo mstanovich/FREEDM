@@ -41,11 +41,13 @@ CDeviceFactory::CDeviceFactory( CPhysicalDeviceManager & manager,
         : m_manager(manager)
 {
 #if defined USE_DEVICE_PSCAD
-    m_client = CLineClient::Create(ios);
-    m_client->Connect(host,port);
+    m_rtdsClient = boost::shared_ptr<CClientRTDS>();  //set pointer to clientRTDS to null
+    m_lineClient = CLineClient::Create(ios);
+    m_lineClient->Connect(host,port);
 #elif defined USE_DEVICE_RTDS
-    m_client = CClientRTDS::Create(ios, xml);
-    m_client->connect(host,port);
+    m_lineClient = boost::shared_ptr<CLineClient>();  //set pointer to lineClient to null
+    m_rtdsClient = CClientRTDS::Create(ios, xml);
+    m_rtdsClient->Connect(host,port);
 #endif
 }
 
@@ -53,9 +55,9 @@ CDeviceFactory::CDeviceFactory( CPhysicalDeviceManager & manager,
 IDeviceStructure::DevicePtr CDeviceFactory::CreateStructure()
 {
 #if defined USE_DEVICE_PSCAD
-    return IDeviceStructure::DevicePtr( new CDeviceStructurePSCAD(m_client) );
+    return IDeviceStructure::DevicePtr( new CDeviceStructurePSCAD(m_lineClient) );
 #elif defined USE_DEVICE_RTDS
-    return IDeviceStructure::DevicePtr( new CDeviceStructureRTDS(m_client) );
+    return IDeviceStructure::DevicePtr( new CDeviceStructureRTDS(m_rtdsClient) );
 #else
     return IDeviceStructure::DevicePtr( new CDeviceStructureGeneric() );
 #endif

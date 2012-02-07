@@ -37,6 +37,7 @@
 #include "CPhysicalDeviceManager.hpp"
 
 #include "CDeviceStructurePSCAD.hpp"
+#include "CDeviceStructureRTDS.hpp"
 #include "CDeviceStructureGeneric.hpp"
 
 namespace freedm
@@ -78,7 +79,8 @@ class CDeviceFactory
         CPhysicalDeviceManager & m_manager;
         
         /// Client to the PSCAD simulation server
-        CLineClient::TPointer m_client;
+        CLineClient::TPointer m_lineClient;
+        CClientRTDS::RTDSPointer m_rtdsClient;
 };
 
 } // namespace device

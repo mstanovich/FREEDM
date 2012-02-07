@@ -7,7 +7,7 @@ set(ALT_BUILD_VERSION "Unversioned")
 # configurable project options
 # TUTORIAL on how to add a new option:
 #   add the option below with a help message defaulted to OFF
-#   add the option to Broker/include/cmake.hpp.cmake as #cmakedefine OPTION
+#   add the option to Broker/include/config.hpp.cmake as #cmakedefine OPTION
 #   activate / deactivate the option as described in the message below
 option(BUILD_TESTS "Enable the building and running of unit tests." OFF)
 option(SHOW_WARNINGS "warnings displayed during project compile" OFF)
