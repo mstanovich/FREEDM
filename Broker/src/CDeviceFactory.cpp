@@ -41,10 +41,10 @@ CDeviceFactory::CDeviceFactory( CPhysicalDeviceManager & manager,
         : m_manager(manager)
 {
 #if defined USE_DEVICE_PSCAD
-    m_client(CLineClient::Create(ios));
+    m_client = CLineClient::Create(ios);
     m_client->Connect(host,port);
 #elif defined USE_DEVICE_RTDS
-    m_client(CClientRTDS::Create(ios, xml));
+    m_client = CClientRTDS::Create(ios, xml);
     m_client->connect(host,port);
 #endif
 }
