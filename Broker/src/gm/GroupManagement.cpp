@@ -430,7 +430,7 @@ void GMAgent::Recovery()
   m_GrpCounter++;
   m_GroupID = m_GrpCounter;
   m_GroupLeader = GetUUID();
-  foreach( PeerNodePtr peer_, m_AllPeers | boost::adaptors::map_values)
+  foreach( PeerNodePtr peer_, m_AYTResponse | boost::adaptors::map_values)
   {
     if( peer_->GetUUID() == GetUUID())
       continue;
