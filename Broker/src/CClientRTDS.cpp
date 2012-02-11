@@ -140,6 +140,7 @@ void CClientRTDS::Set( const std::string p_device, const std::string p_key,
 {
     //access and write to table
     Logger::Info << __PRETTY_FUNCTION__ << std::endl;
+    //std::cout<<"Set device is "<<p_device<<" and key is "<<p_key<<std::endl;
     m_cmdTable.SetValue( CDeviceKeyCoupled(p_device,p_key), p_value );
 }
 
@@ -147,6 +148,7 @@ double CClientRTDS::Get( const std::string p_device, const std::string p_key )
 {
     //access and read from table
     Logger::Info << __PRETTY_FUNCTION__ << std::endl;
+    //std::cout<<"Get device is "<<p_device<<" and key is "<<p_key<<std::endl;
     return m_stateTable.GetValue( CDeviceKeyCoupled(p_device, p_key) );
 }
 
