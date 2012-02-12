@@ -47,6 +47,7 @@ namespace broker
 namespace device
 {
 
+    class CRTDSClient;
 /// Creates devices and their internal structures
 class CDeviceFactory
         : private boost::noncopyable

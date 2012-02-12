@@ -48,6 +48,7 @@ CDeviceFactory::CDeviceFactory( CPhysicalDeviceManager & manager,
     m_lineClient = boost::shared_ptr<CLineClient>();  //set pointer to lineClient to null
     m_rtdsClient = CClientRTDS::Create(ios, xml);
     m_rtdsClient->Connect(host,port);
+    m_rtdsClient->Run();
 #endif
 }
 

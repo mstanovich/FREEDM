@@ -40,6 +40,7 @@
 #include <string>
 #include <iostream>
 #include <stdexcept>
+#include <sys/param.h>
 
 #include <boost/asio.hpp>
 #include <boost/utility.hpp>
@@ -54,6 +55,7 @@ namespace freedm
 {
 namespace broker
 {
+    
 /// Provides an interface for communicating with a RTDS model
 class CClientRTDS : private boost::noncopyable
 {
@@ -211,8 +213,53 @@ class CClientRTDS : private boost::noncopyable
         ///
         ////////////////////////////////////////////////////////////////////////////
         ~CClientRTDS();
-        
+
+    //it's better to set Run() as private. Can't do it now as it's not in the same namespaces
+    // as DeviceFactory, who needs to access Run().  So this friend class declaration is not
+    // needed now, but may in the future.
+    friend class CDeviceFactory;
+
+        /////////////////////////////////////////////////////////////////////////
+        /// Run
+        /// @description
+        ///      This is the main communication handler.
+        ///      At every time step, initiate and send a message to FPGA, then
+        ///      receive a message from FPGA.  
+        ///      On the FPGA side, it's the reverse order -- receive and then send.
+        ///      Receive will block until a message arrives. Since FPGA side's receive
+        ///      also blocks, we have created a synchronous, lock-step communication between
+        ///      DGI and FPGA.
+        ///      This class uses a timer currently set around 10 miniseconds to regulate 
+        ///      communication cycles. 
+        ///      
+        ///      The parameters __BYTE_ORDER, __LITTLE_ENDIAN, __BIG_ENDIAN should automatically
+        ///      be defined and determined in sys/param.h, which exists in most Unix systems.
+        ///
+        /// @Shared_Memory
+        ///     Uses the passed io_service until destroyed.
+        ///     Runs on its own thread
+        ///
+        /// @Error_Handling
+        ///     none
+        ///
+        /// @pre
+        ///     Connection with FPGA is established.
+        ///
+        /// @post
+        ///     All values in the cmdTable is written to a buffer and send to
+        ///     FPGA.
+        ///     All values in the stateTable is rewritten with value received
+        ///     from FPGA.
+        ///
+        /// @param
+        ///
+        /// @limitations
+        ///     none
+        //////////////////////////////////////////////////////////////////////////
+        void Run();      
+  
     private:
+  
         ////////////////////////////////////////////////////////////////////////////
         /// CClientRTDS( io_service & )
         ///
@@ -239,36 +286,6 @@ class CClientRTDS : private boost::noncopyable
         ///
         ////////////////////////////////////////////////////////////////////////////
         CClientRTDS( boost::asio::io_service & p_service, const std::string p_xml );
-        
-        /////////////////////////////////////////////////////////////////////////
-        /// Run
-        /// @description
-        ///      This is the main communication handler.
-        ///      At every time step, initiate and send a message to FPGA, then
-        ///      receive a message from FPGA.
-        ///
-        /// @Shared_Memory
-        ///     Uses the passed io_service until destroyed.
-        ///     Runs on its own thread
-        ///
-        /// @Error_Handling
-        ///     none
-        ///
-        /// @pre
-        ///     Connection with FPGA is established.
-        ///
-        /// @post
-        ///     All values in the cmdTable is written to a buffer and send to
-        ///     FPGA.
-        ///     All values in the stateTable is rewritten with value received
-        ///     from FPGA.
-        ///
-        /// @param
-        ///
-        /// @limitations
-        ///     none
-        //////////////////////////////////////////////////////////////////////////
-        void Run();
         
         ////////////////////////////////////////////////////////////////////////////////
         /// endian_swap
