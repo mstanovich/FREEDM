@@ -26,13 +26,14 @@
 
 #include "CTableStructure.hpp"
 
-namespace freedm {
-namespace simulation {
+namespace freedm
+{
+namespace simulation
+{
 
 CTableStructure::CTableStructure( const std::string & p_xml, const std::string & p_tag )
 {
     using boost::property_tree::ptree;
-    
     boost::optional<size_t> parent;
     std::stringstream error;
     std::string device;
@@ -40,13 +41,10 @@ CTableStructure::CTableStructure( const std::string & p_xml, const std::string &
     ptree xmlTree;
     size_t index;
     size_t nsst;
-    
     // create property tree from the XML input
     read_xml( p_xml, xmlTree );
-    
     // get the number of sst for input validation
     nsst = xmlTree.get<size_t>("SSTCount");
-
     // each child of p_tag is a table entry
     m_TableSize = xmlTree.get_child(p_tag).size();
     BOOST_FOREACH( ptree::value_type & child, xmlTree.get_child(p_tag) )
@@ -55,41 +53,40 @@ CTableStructure::CTableStructure( const std::string & p_xml, const std::string &
         device  = child.second.get<std::string>("device");
         key     = child.second.get<std::string>("key");
         parent  = child.second.get_optional<size_t>("parent");
-        
         // create the data structures
         CDeviceKey dkey( device, key );
         std::set<size_t> plist;
         
         // validate the element index
-        if( index == 0 || index > m_TableSize )
+        if ( index == 0 || index > m_TableSize )
         {
             error << p_tag << " has an entry with index " << index;
             throw std::out_of_range( error.str() );
         }
         
         // prevent duplicate element indexes
-        if( m_DeviceIndex.by<SIndex>().count(index) > 0 )
+        if ( m_DeviceIndex.by<SIndex>().count(index) > 0 )
         {
             error << p_tag << " has multiple entries with index " << index;
             throw std::logic_error( error.str() );
         }
         
         // prevent duplicate device keys
-        if( m_DeviceIndex.by<SDevice>().count(dkey) > 0 )
+        if ( m_DeviceIndex.by<SDevice>().count(dkey) > 0 )
         {
             error << p_tag << " has multiple entries with key " << dkey;
             throw std::logic_error( error.str() );
         }
         
         // validate the parent index if a parent is specified
-        if( parent && (parent.get() == 0 || parent.get() > nsst) )
+        if ( parent && (parent.get() == 0 || parent.get() > nsst) )
         {
             error << p_tag << " has a parent with index " << parent.get();
             throw std::out_of_range( error.str() );
         }
-
+        
         // initialize the parent list
-        if( parent )
+        if ( parent )
         {
             // if parent specified, use parent
             plist.insert(parent.get());
@@ -97,12 +94,12 @@ CTableStructure::CTableStructure( const std::string & p_xml, const std::string &
         else
         {
             // if parent not specified, universal access
-            for( size_t i = nsst; i > 0; i-- )
+            for ( size_t i = nsst; i > 0; i-- )
             {
                 plist.insert(i);
             }
         }
-
+        
         // store the table entry
         m_DeviceIndex.insert( TBimap::value_type(dkey,index-1) );
         m_DeviceParent.insert( std::map< CDeviceKey, std::set<size_t> >::value_type(dkey,plist) );
@@ -111,7 +108,7 @@ CTableStructure::CTableStructure( const std::string & p_xml, const std::string &
 
 size_t CTableStructure::FindIndex( const CDeviceKey & p_dkey ) const
 {
-    // search by device for the requested p_dkey 
+    // search by device for the requested p_dkey
     return( m_DeviceIndex.by<SDevice>().at(p_dkey) );
 }
 
@@ -124,11 +121,10 @@ const CDeviceKey & CTableStructure::FindDevice( size_t p_index ) const
 bool CTableStructure::HasAccess( const CDeviceKey & p_dkey, size_t p_parent ) const
 {
     std::map< CDeviceKey, std::set<size_t> >::const_iterator it;
-    
     // search the table for p_dkey
     it = m_DeviceParent.find(p_dkey);
     
-    if( it != m_DeviceParent.end() )
+    if ( it != m_DeviceParent.end() )
     {
         // search the parent list for p_parent
         return( it->second.count(p_parent) > 0 );

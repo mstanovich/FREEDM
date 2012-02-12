@@ -46,8 +46,10 @@
 
 CREATE_EXTERN_STD_LOGS()
 
-namespace freedm {
-namespace simulation {
+namespace freedm
+{
+namespace simulation
+{
 
 ////////////////////////////////////////////////////////////////////////////////
 /// CSimulationInterface
@@ -64,117 +66,117 @@ namespace simulation {
 ////////////////////////////////////////////////////////////////////////////////
 class CSimulationInterface : private boost::noncopyable
 {
-public:
-    typedef boost::shared_ptr<CSimulationInterface> TPointer;
-    
-    static TPointer Create( boost::asio::io_service & p_service, CDeviceTable & p_command,
-        CDeviceTable & p_state, unsigned short p_port, size_t p_index );
-private:
-    ////////////////////////////////////////////////////////////////////////////
-    /// CSimulationInterface( io_service &, CDeviceTable &, CDeviceTable &, unsigned short, size_t )
-    ///
-    /// @description
-    ///     Creates a simulation interface using the given port number.
-    ///
-    /// @Shared_Memory
-    ///     Uses the passed io_service and CDeviceTable until destroyed.
-    ///
-    /// @Error_Handling
-    ///     none
-    ///
-    /// @pre
-    ///     none
-    ///
-    /// @post
-    ///     creates a new reference to a CLineServer on p_port
-    ///
-    /// @param
-    ///     p_service is the io_service the line server runs on
-    ///     p_command is the device command table maintained by the server
-    ///     p_state is the device state table maintained by the server
-    ///     p_port is the port the line server listens on
-    ///     p_index is the interface unique identifier
-    ///
-    /// @limitations
-    ///     none
-    ///
-    ////////////////////////////////////////////////////////////////////////////
-    CSimulationInterface( boost::asio::io_service & p_service, CDeviceTable & p_command,
-        CDeviceTable & p_state, unsigned short p_port, size_t p_index );
-    
-    ////////////////////////////////////////////////////////////////////////////
-    /// Set( const string &, const string &, const string & )
-    ///
-    /// @description
-    ///     Modifies a value in the command table.
-    ///
-    /// @Shared_Memory
-    ///     m_command is accessed and modified
-    ///
-    /// @Error_Handling
-    ///     none
-    ///
-    /// @pre
-    ///     (p_device,p_key) is in m_command
-    ///     m_index has access to (p_device,p_key)
-    ///
-    /// @post
-    ///     (p_device,p_key) in m_command is set to p_value
-    ///
-    /// @param
-    ///     p_device is the device identifier to modify
-    ///     p_key is the device variable to modify
-    ///     p_value is the value to set
-    ///
-    /// @limitations
-    ///     none
-    ///
-    ////////////////////////////////////////////////////////////////////////////
-    void Set( const std::string & p_device, const std::string & p_key, const std::string & p_value );
-    
-    ////////////////////////////////////////////////////////////////////////////
-    /// Get( const string &, const string & )
-    ///
-    /// @description
-    ///     Returns a value from the command table.
-    ///
-    /// @Shared_Memory
-    ///     m_state is accessed
-    ///
-    /// @Error_Handling
-    ///     none
-    ///
-    /// @pre
-    ///     (p_device,p_key) is in m_state
-    ///     m_index has access to (p_device,p_key)
-    ///
-    /// @post
-    ///     none
-    ///
-    /// @param
-    ///     p_device is the device identifier to retrieve
-    ///     p_key is the device variable to retrieve
-    ///
-    /// @return
-    ///     stored value for (p_device,p_key) in m_state
-    ///
-    /// @limitations
-    ///     none
-    ///
-    ////////////////////////////////////////////////////////////////////////////
-    std::string Get( const std::string & p_device, const std::string & p_key );
-
-    /// line server for cyber control requests
-    CLineServer::TPointer m_server;
-    
-    /// device command table
-    CDeviceTable & m_command;
-    
-    /// device state table
-    CDeviceTable & m_state;
-    
-    /// unique identifier
-    size_t m_index;
+    public:
+        typedef boost::shared_ptr<CSimulationInterface> TPointer;
+        
+        static TPointer Create( boost::asio::io_service & p_service, CDeviceTable & p_command,
+                                CDeviceTable & p_state, unsigned short p_port, size_t p_index );
+    private:
+        ////////////////////////////////////////////////////////////////////////////
+        /// CSimulationInterface( io_service &, CDeviceTable &, CDeviceTable &, unsigned short, size_t )
+        ///
+        /// @description
+        ///     Creates a simulation interface using the given port number.
+        ///
+        /// @Shared_Memory
+        ///     Uses the passed io_service and CDeviceTable until destroyed.
+        ///
+        /// @Error_Handling
+        ///     none
+        ///
+        /// @pre
+        ///     none
+        ///
+        /// @post
+        ///     creates a new reference to a CLineServer on p_port
+        ///
+        /// @param
+        ///     p_service is the io_service the line server runs on
+        ///     p_command is the device command table maintained by the server
+        ///     p_state is the device state table maintained by the server
+        ///     p_port is the port the line server listens on
+        ///     p_index is the interface unique identifier
+        ///
+        /// @limitations
+        ///     none
+        ///
+        ////////////////////////////////////////////////////////////////////////////
+        CSimulationInterface( boost::asio::io_service & p_service, CDeviceTable & p_command,
+                              CDeviceTable & p_state, unsigned short p_port, size_t p_index );
+                              
+        ////////////////////////////////////////////////////////////////////////////
+        /// Set( const string &, const string &, const string & )
+        ///
+        /// @description
+        ///     Modifies a value in the command table.
+        ///
+        /// @Shared_Memory
+        ///     m_command is accessed and modified
+        ///
+        /// @Error_Handling
+        ///     none
+        ///
+        /// @pre
+        ///     (p_device,p_key) is in m_command
+        ///     m_index has access to (p_device,p_key)
+        ///
+        /// @post
+        ///     (p_device,p_key) in m_command is set to p_value
+        ///
+        /// @param
+        ///     p_device is the device identifier to modify
+        ///     p_key is the device variable to modify
+        ///     p_value is the value to set
+        ///
+        /// @limitations
+        ///     none
+        ///
+        ////////////////////////////////////////////////////////////////////////////
+        void Set( const std::string & p_device, const std::string & p_key, const std::string & p_value );
+        
+        ////////////////////////////////////////////////////////////////////////////
+        /// Get( const string &, const string & )
+        ///
+        /// @description
+        ///     Returns a value from the command table.
+        ///
+        /// @Shared_Memory
+        ///     m_state is accessed
+        ///
+        /// @Error_Handling
+        ///     none
+        ///
+        /// @pre
+        ///     (p_device,p_key) is in m_state
+        ///     m_index has access to (p_device,p_key)
+        ///
+        /// @post
+        ///     none
+        ///
+        /// @param
+        ///     p_device is the device identifier to retrieve
+        ///     p_key is the device variable to retrieve
+        ///
+        /// @return
+        ///     stored value for (p_device,p_key) in m_state
+        ///
+        /// @limitations
+        ///     none
+        ///
+        ////////////////////////////////////////////////////////////////////////////
+        std::string Get( const std::string & p_device, const std::string & p_key );
+        
+        /// line server for cyber control requests
+        CLineServer::TPointer m_server;
+        
+        /// device command table
+        CDeviceTable & m_command;
+        
+        /// device state table
+        CDeviceTable & m_state;
+        
+        /// unique identifier
+        size_t m_index;
 };
 
 } // namespace simulation

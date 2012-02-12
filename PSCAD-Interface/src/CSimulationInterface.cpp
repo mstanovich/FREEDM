@@ -26,24 +26,26 @@
 
 #include "CSimulationInterface.hpp"
 
-namespace freedm {
-namespace simulation {
+namespace freedm
+{
+namespace simulation
+{
 
 CSimulationInterface::TPointer CSimulationInterface::Create( boost::asio::io_service & p_service,
-    CDeviceTable & p_command, CDeviceTable & p_state, unsigned short p_port, size_t p_index )
+        CDeviceTable & p_command, CDeviceTable & p_state, unsigned short p_port, size_t p_index )
 {
     Logger::Info << __PRETTY_FUNCTION__ << std::endl;
     return TPointer( new CSimulationInterface(p_service,p_command,p_state,p_port,p_index) );
 }
 
 CSimulationInterface::CSimulationInterface( boost::asio::io_service & p_service,
-    CDeviceTable & p_command, CDeviceTable & p_state, unsigned short p_port, size_t p_index )
-    : m_command(p_command), m_state(p_state), m_index(p_index)
+        CDeviceTable & p_command, CDeviceTable & p_state, unsigned short p_port, size_t p_index )
+        : m_command(p_command), m_state(p_state), m_index(p_index)
 {
     Logger::Info << __PRETTY_FUNCTION__ << std::endl;
     m_server = CLineServer::Create( p_service, p_port,
-        boost::bind(&CSimulationInterface::Set, boost::ref(*this), _1, _2, _3),
-        boost::bind(&CSimulationInterface::Get, boost::ref(*this), _1, _2) );
+                                    boost::bind(&CSimulationInterface::Set, boost::ref(*this), _1, _2, _3),
+                                    boost::bind(&CSimulationInterface::Get, boost::ref(*this), _1, _2) );
     Logger::Notice << "DGI-Interface " << p_index << " will use port " << p_port << std::endl;
 }
 

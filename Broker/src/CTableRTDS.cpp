@@ -37,8 +37,8 @@ CTableRTDS::CTableRTDS( const std::string & p_xml, const std::string & p_tag )
     Logger::Info << __PRETTY_FUNCTION__ << std::endl;
     m_length = m_structure.GetSize();
     m_data = new float[m_length];
-
-    //initialize table values. 
+    
+    //initialize table values.
     for ( size_t i = 0; i < m_length; i++ )
     {
         m_data[i]= 0;

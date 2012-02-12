@@ -36,8 +36,10 @@
 #include <string>
 #include <fstream>
 
-namespace freedm {
-namespace simulation {
+namespace freedm
+{
+namespace simulation
+{
 
 class CDeviceKey;
 
@@ -118,43 +120,43 @@ std::ostream & operator<<( std::ostream & p_os, const CDeviceKey & p_dkey );
 ////////////////////////////////////////////////////////////////////////////////
 class CDeviceKey
 {
-public:
-    ////////////////////////////////////////////////////////////////////////////
-    /// CDeviceKey( const string &, const string & )
-    ///
-    /// @description
-    ///     Creates an instance of a device key.
-    ///
-    /// @Shared_Memory
-    ///     none
-    ///
-    /// @Error_Handling
-    ///     none
-    ///
-    /// @pre
-    ///     none
-    ///
-    /// @post
-    ///     none
-    ///
-    /// @param
-    ///     p_device is the unique device identifier
-    ///     p_key is the device variable of interest
-    ///
-    /// @limitations
-    ///     none
-    ///
-    ////////////////////////////////////////////////////////////////////////////
-    CDeviceKey( const std::string & p_device, const std::string & p_key );
-    
-    friend bool operator<( const CDeviceKey & p_lhs, const CDeviceKey & p_rhs );
-    friend std::ostream & operator<<( std::ostream & p_os, const CDeviceKey & p_dkey );
-private:
-    /// unique device identifier
-    std::string m_device;
-    
-    /// variable of interest
-    std::string m_key;
+    public:
+        ////////////////////////////////////////////////////////////////////////////
+        /// CDeviceKey( const string &, const string & )
+        ///
+        /// @description
+        ///     Creates an instance of a device key.
+        ///
+        /// @Shared_Memory
+        ///     none
+        ///
+        /// @Error_Handling
+        ///     none
+        ///
+        /// @pre
+        ///     none
+        ///
+        /// @post
+        ///     none
+        ///
+        /// @param
+        ///     p_device is the unique device identifier
+        ///     p_key is the device variable of interest
+        ///
+        /// @limitations
+        ///     none
+        ///
+        ////////////////////////////////////////////////////////////////////////////
+        CDeviceKey( const std::string & p_device, const std::string & p_key );
+        
+        friend bool operator<( const CDeviceKey & p_lhs, const CDeviceKey & p_rhs );
+        friend std::ostream & operator<<( std::ostream & p_os, const CDeviceKey & p_dkey );
+    private:
+        /// unique device identifier
+        std::string m_device;
+        
+        /// variable of interest
+        std::string m_key;
 };
 
 } // namespace simulation

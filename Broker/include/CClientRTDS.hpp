@@ -55,7 +55,7 @@ namespace freedm
 {
 namespace broker
 {
-    
+
 /// Provides an interface for communicating with a RTDS model
 class CClientRTDS : private boost::noncopyable
 {
@@ -213,25 +213,25 @@ class CClientRTDS : private boost::noncopyable
         ///
         ////////////////////////////////////////////////////////////////////////////
         ~CClientRTDS();
-
-    //it's better to set Run() as private. Can't do it now as it's not in the same namespaces
-    // as DeviceFactory, who needs to access Run().  So this friend class declaration is not
-    // needed now, but may in the future.
-    friend class CDeviceFactory;
-
+        
+        //it's better to set Run() as private. Can't do it now as it's not in the same namespaces
+        // as DeviceFactory, who needs to access Run().  So this friend class declaration is not
+        // needed now, but may in the future.
+        friend class CDeviceFactory;
+        
         /////////////////////////////////////////////////////////////////////////
         /// Run
         /// @description
         ///      This is the main communication handler.
         ///      At every time step, initiate and send a message to FPGA, then
-        ///      receive a message from FPGA.  
+        ///      receive a message from FPGA.
         ///      On the FPGA side, it's the reverse order -- receive and then send.
         ///      Receive will block until a message arrives. Since FPGA side's receive
         ///      also blocks, we have created a synchronous, lock-step communication between
         ///      DGI and FPGA.
-        ///      This class uses a timer currently set around 10 miniseconds to regulate 
-        ///      communication cycles. 
-        ///      
+        ///      This class uses a timer currently set around 10 miniseconds to regulate
+        ///      communication cycles.
+        ///
         ///      The parameters __BYTE_ORDER, __LITTLE_ENDIAN, __BIG_ENDIAN should automatically
         ///      be defined and determined in sys/param.h, which exists in most Unix systems.
         ///
@@ -256,10 +256,10 @@ class CClientRTDS : private boost::noncopyable
         /// @limitations
         ///     none
         //////////////////////////////////////////////////////////////////////////
-        void Run();      
-  
+        void Run();
+        
     private:
-  
+    
         ////////////////////////////////////////////////////////////////////////////
         /// CClientRTDS( io_service & )
         ///

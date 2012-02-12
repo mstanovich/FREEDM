@@ -26,13 +26,15 @@
 
 #include "CDeviceKey.hpp"
 
-namespace freedm {
-namespace simulation {
+namespace freedm
+{
+namespace simulation
+{
 
 bool operator<( const CDeviceKey & p_lhs, const CDeviceKey & p_rhs )
 {
     return( p_lhs.m_device < p_rhs.m_device
-        || (p_lhs.m_device == p_rhs.m_device && p_lhs.m_key < p_rhs.m_key) );
+            || (p_lhs.m_device == p_rhs.m_device && p_lhs.m_key < p_rhs.m_key) );
 }
 
 std::ostream & operator<<( std::ostream & p_os, const CDeviceKey & p_dkey )
@@ -41,7 +43,7 @@ std::ostream & operator<<( std::ostream & p_os, const CDeviceKey & p_dkey )
 }
 
 CDeviceKey::CDeviceKey( const std::string & p_device, const std::string & p_key )
-    : m_device(p_device), m_key(p_key)
+        : m_device(p_device), m_key(p_key)
 {
     // skip
 }

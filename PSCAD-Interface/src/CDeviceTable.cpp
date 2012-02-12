@@ -26,18 +26,19 @@
 
 #include "CDeviceTable.hpp"
 
-namespace freedm {
-namespace simulation {
+namespace freedm
+{
+namespace simulation
+{
 
 CDeviceTable::CDeviceTable( const std::string & p_xml, const std::string & p_tag )
-    : m_structure( p_xml, p_tag )
+        : m_structure( p_xml, p_tag )
 {
     Logger::Info << __PRETTY_FUNCTION__ << std::endl;
-    
     m_length    = m_structure.GetSize();
     m_data      = new double[m_length];
-
-    for( size_t i = 0; i < m_length; i++ )
+    
+    for ( size_t i = 0; i < m_length; i++ )
     {
         m_data[i] = 0;
     }
@@ -49,7 +50,7 @@ double CDeviceTable::GetValue( const CDeviceKey & p_dkey, size_t p_index )
     std::stringstream error;
     
     // check for read permission
-    if( !m_structure.HasAccess(p_dkey,p_index) )
+    if ( !m_structure.HasAccess(p_dkey,p_index) )
     {
         error << p_index << " does not have access to " << p_dkey;
         throw std::logic_error( error.str() );
@@ -58,7 +59,6 @@ double CDeviceTable::GetValue( const CDeviceKey & p_dkey, size_t p_index )
     // enter critical section of m_data as reader
     boost::shared_lock<boost::shared_mutex> lock(m_mutex);
     Logger::Debug << "DGI-Interface " << p_index << " obtained mutex as reader" << std::endl;
-    
     // convert the key to an index and return its value
     return m_data[m_structure.FindIndex(p_dkey)];
 }
@@ -69,7 +69,7 @@ void CDeviceTable::SetValue( const CDeviceKey & p_dkey, size_t p_index, double p
     std::stringstream error;
     
     // check for write permission
-    if( !m_structure.HasAccess(p_dkey,p_index) )
+    if ( !m_structure.HasAccess(p_dkey,p_index) )
     {
         error << p_index << " does not have access to " << p_dkey;
         throw std::logic_error( error.str() );
@@ -78,7 +78,6 @@ void CDeviceTable::SetValue( const CDeviceKey & p_dkey, size_t p_index, double p
     // enter critical section of m_data as writer
     boost::unique_lock<boost::shared_mutex> lock(m_mutex);
     Logger::Debug << "DGI-Interface " << p_index << " obtained mutex as writer" << std::endl;
-    
     // convert the key to an index and set its value
     m_data[m_structure.FindIndex(p_dkey)] = p_value;
 }

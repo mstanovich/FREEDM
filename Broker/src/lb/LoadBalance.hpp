@@ -64,15 +64,17 @@ using boost::asio::ip::tcp;
 
 using namespace boost::asio;
 
-namespace freedm {
+namespace freedm
+{
 
 const unsigned int STATE_TIMEOUT = 20;
 const double NORMAL_TOLERANCE = 0.5;
 
 // Global constants
-enum {
-LOAD_TIMEOUT = 15,
-FAULT_TIMEOUT = 10
+enum
+{
+    LOAD_TIMEOUT = 15,
+    FAULT_TIMEOUT = 10
 };
 
 
@@ -82,75 +84,75 @@ FAULT_TIMEOUT = 10
 /// @limitations None
 /////////////////////////////////////////////////////////
 class lbAgent
-  : public IReadHandler,
-    public LPeerNode,
-    public Templates::Singleton< lbAgent >,
-    public IAgent< boost::shared_ptr<LPeerNode> >
+        : public IReadHandler,
+        public LPeerNode,
+        public Templates::Singleton< lbAgent >,
+        public IAgent< boost::shared_ptr<LPeerNode> >
 {
-  friend class Templates::Singleton< lbAgent >;
-  public:
+        friend class Templates::Singleton< lbAgent >;
+    public:
         lbAgent();
-lbAgent(std::string uuid_,
-boost::asio::io_service &ios,
-freedm::broker::CDispatcher &p_dispatch,
-freedm::broker::CConnectionManager &m_conManager,
-freedm::broker::CPhysicalDeviceManager &m_phyManager);
-lbAgent( const lbAgent& );
-lbAgent& operator = ( const lbAgent& );
-          virtual ~lbAgent();
-                    
+        lbAgent(std::string uuid_,
+                boost::asio::io_service &ios,
+                freedm::broker::CDispatcher &p_dispatch,
+                freedm::broker::CConnectionManager &m_conManager,
+                freedm::broker::CPhysicalDeviceManager &m_phyManager);
+        lbAgent( const lbAgent& );
+        lbAgent& operator = ( const lbAgent& );
+        virtual ~lbAgent();
+        
 // Internal
-void SendDraftRequest();
-void LoadTable();
+        void SendDraftRequest();
+        void LoadTable();
         void LoadManage();
-
+        
         PeerNodePtr add_peer(std::string uuid);
         PeerNodePtr get_peer(std::string uuid);
         // Handlers
         void HandleRead(broker::CMessage msg);
-void LoadManage( const boost::system::error_code& err );
-
+        void LoadManage( const boost::system::error_code& err );
+        
 // This is the main loop of the algorithm
         int LB();
         int step;
- 
-  private:
         
-   PeerSet m_HiNodes;
-  PeerSet m_NoNodes;
-   PeerSet m_LoNodes;
-   PeerSet l_AllPeers;
-
+    private:
+    
+        PeerSet m_HiNodes;
+        PeerSet m_NoNodes;
+        PeerSet m_LoNodes;
+        PeerSet l_AllPeers;
+        
 // The handler for all incoming requests.
-   freedm::broker::CPhysicalDeviceManager &m_phyDevManager;
-   void InitiatePowerMigration(broker::device::SettingValue DemandValue);
-
-/* IO and Timers */
-deadline_timer m_GlobalTimer;
-    
-    /// timer until next periodic state collection
-    deadline_timer m_StateTimer;
-
-    /// flag to indicate group leadership position
-    bool m_leader;
-    
-    /// normalized gateway value
-    boost::optional<double> m_normal;
-    
-    /// sets an asynchronous timer for state collection
-    void StartStateTimer( unsigned int delay );
-    
-    /// handles the next periodic state collection call
-    void HandleStateTimer( const boost::system::error_code & error );
-    
-    /// call to state collection
-    void CollectState();
-    
-    /// calculate the normal value of collected state
-    void StateNormalize( const ptree & pt );
-    
-    /// update internal normalized gateway value
-    void UpdateNormal( const ptree & pt );
+        freedm::broker::CPhysicalDeviceManager &m_phyDevManager;
+        void InitiatePowerMigration(broker::device::SettingValue DemandValue);
+        
+        /* IO and Timers */
+        deadline_timer m_GlobalTimer;
+        
+        /// timer until next periodic state collection
+        deadline_timer m_StateTimer;
+        
+        /// flag to indicate group leadership position
+        bool m_leader;
+        
+        /// normalized gateway value
+        boost::optional<double> m_normal;
+        
+        /// sets an asynchronous timer for state collection
+        void StartStateTimer( unsigned int delay );
+        
+        /// handles the next periodic state collection call
+        void HandleStateTimer( const boost::system::error_code & error );
+        
+        /// call to state collection
+        void CollectState();
+        
+        /// calculate the normal value of collected state
+        void StateNormalize( const ptree & pt );
+        
+        /// update internal normalized gateway value
+        void UpdateNormal( const ptree & pt );
 };
 }
 
