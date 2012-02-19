@@ -42,12 +42,34 @@ namespace broker
 
 CClientRTDS::RTDSPointer CClientRTDS::Create( boost::asio::io_service & p_service, const std::string p_xml )
 {
+     //float has to be 4 bytes. This check is probably not needed, as floats are always 4 bytes
+    if (sizeof(float)!=4)
+    {
+        Logger::Error<<"floating point size error. "<<"float must be 4 bytes when usig RTDS simulation:"<<std::endl;
+        exit(1);
+    }
+    
+    //command and state tables are using floats only.  So this is probably not needed.
+    if (sizeof(int)!=4)
+    {
+        Logger::Error<<"int size error."<<" int must be 4 bytes when usig RTDS simulation:"<<std::endl;
+        exit(1);
+    }
+    
     return CClientRTDS::RTDSPointer( new CClientRTDS(p_service, p_xml) );
 }
 
 CClientRTDS::CClientRTDS( boost::asio::io_service & p_service, const std::string p_xml )
         : m_socket(p_service), m_GlobalTimer(p_service), m_cmdTable(p_xml, "command"), m_stateTable(p_xml, "state")
 {
+    rx_count = m_stateTable.m_length;
+    tx_count = m_cmdTable.m_length;
+    //each value in stateTable and cmdTable is of type float (4 bytes)
+    rx_bufSize = 4 * rx_count;
+    tx_bufSize = 4 * tx_count;
+    //allocate memory for buffer for reading and writing to FPGA
+    rx_buffer = (char*)malloc(rx_bufSize);
+    tx_buffer = (char*)malloc(tx_bufSize);
 }
 
 //FPGA's hostname and port number resolved and passed in by PosixMain
@@ -79,41 +101,19 @@ void CClientRTDS::Run()
 {
     //Start the timer; on timeout, this function is called again
     m_GlobalTimer.expires_from_now( boost::posix_time::microseconds(TIMESTEP) );
-    //how many values are in the stateTable that stores readings from RTDS
-    int rx_count = m_stateTable.m_length;
-    //how many values are in the cmdTable that stores orders to RTDS
-    int tx_count = m_cmdTable.m_length;
-    
-    //float type has to use 4 bytes of storage.
-    if (sizeof(float)!=4)
+    //**********************************
+    //* Always send data to FPGA first *
+    //**********************************
     {
-        Logger::Error<<"floating point size error. "<<"float must be 4 bytes when usig RTDS simulation:"<<std::endl;
-        exit(1);
+        boost::shared_lock<boost::shared_mutex> lockRead(m_cmdTable.m_mutex);
+        Logger::Debug << "Client_RTDS - obtained mutex as reader" << std::endl;
+        //read from cmdTable
+        memcpy(tx_buffer, m_cmdTable.m_data, tx_bufSize);
+        Logger::Debug << "Client_RTDS - released reader mutex" << std::endl;
     }
-    
-    //command and state tables are using floats only.  So this may not be needed.
-    if (sizeof(int)!=4)
-    {
-        Logger::Error<<"int size error."<<" int must be 4 bytes when usig RTDS simulation:"<<std::endl;
-        exit(1);
-    }
-    
-    //each value is type float (4 bytes)
-    int rx_bufSize = 4*rx_count;
-    int tx_bufSize = 4*tx_count;
-    //buffer for reading and writing to FPGA
-    char* rx_buffer = (char*)malloc(rx_bufSize);
-    char* tx_buffer = (char*)malloc(tx_bufSize);
-    //Always send data to FPGA first
-    boost::shared_lock<boost::shared_mutex> lockRead(m_cmdTable.m_mutex);
-    Logger::Debug << "Client_RTDS - obtained mutex as reader" << std::endl;
-    //read from cmdTable
-    memcpy(tx_buffer, m_cmdTable.m_data, tx_bufSize);
-    Logger::Debug << "Client_RTDS - released reader mutex" << std::endl;
     // FPGA will send values in big-endian byte order
     // If host machine is in little-endian byte order, convert to big-endian
 #if __BYTE_ORDER == __LITTLE_ENDIAN
-    
     for (int i=0; i<tx_count; i++)
     {
         endian_swap((char *)&tx_buffer[4*i], sizeof(float)); //should be 4 bytes in float.
@@ -123,7 +123,10 @@ void CClientRTDS::Run()
     // send to FPGA.
     // Note boost::asio::buffer() function uses buffer size_in_bytes
     boost::asio::write( m_socket, boost::asio::buffer(tx_buffer, tx_bufSize) );
-    //Receive data from FPGA next
+    
+    //*******************************
+    //* Receive data from FPGA next *
+    //*******************************
     boost::asio::read( m_socket, boost::asio::buffer(rx_buffer, rx_bufSize) );
     // FPGA will send values in big-endian byte order
     // If host machine is in little-endian byte order, convert to little-endian
@@ -133,15 +136,14 @@ void CClientRTDS::Run()
     {
         endian_swap((char *)&rx_buffer[4*j], sizeof(float));
     }
-    
 #endif
-    boost::unique_lock<boost::shared_mutex> lockWrite(m_stateTable.m_mutex);
-    Logger::Debug << "Client_RTDS - obtained mutex as writer" << std::endl;
-    //write to stateTable
-    memcpy(m_stateTable.m_data, rx_buffer, rx_bufSize);
-    Logger::Debug << "Client_RTDS - released writer mutex" << std::endl;
-    free(rx_buffer);
-    free(tx_buffer);
+    {
+        boost::unique_lock<boost::shared_mutex> lockWrite(m_stateTable.m_mutex);
+        Logger::Debug << "Client_RTDS - obtained mutex as writer" << std::endl;
+        //write to stateTable
+        memcpy(m_stateTable.m_data, rx_buffer, rx_bufSize);
+        Logger::Debug << "Client_RTDS - released writer mutex" << std::endl;
+    }
     m_GlobalTimer.async_wait( boost::bind(&CClientRTDS::Run, this));
 }
 
@@ -168,6 +170,8 @@ void CClientRTDS::Quit()
 
 CClientRTDS::~CClientRTDS()
 {
+    free(rx_buffer);
+    free(tx_buffer);
     //  perform teardown
     if ( m_socket.is_open() )
     {

@@ -308,6 +308,20 @@ class CClientRTDS : private boost::noncopyable
         //store the commands to send to RTDS
         CTableRTDS m_stateTable;
         
+        //how many values are in the stateTable
+        int rx_count;
+        //how many values are in the cmdTable
+        int tx_count;
+
+        //buffer for reading from FPGA
+        char* rx_buffer;
+        //buffer for writing to FPGA
+        char* tx_buffer;
+
+        //buffer size in bytes
+        int rx_bufSize;
+        int tx_bufSize;
+        
         //timer object to set send/receive cycle pace
         boost::asio::deadline_timer m_GlobalTimer;
 };
