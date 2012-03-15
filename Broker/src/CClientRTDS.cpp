@@ -34,7 +34,7 @@
 #error "unsupported endianness or __BYTE_ORDER not defined"
 #endif
 
-#define TIMESTEP 10000  //in microseconds (so it's 10 miniseconds)
+#define TIMESTEP 10000  //in microseconds (so it's 10 milliseconds)
 namespace freedm
 {
 namespace broker
