@@ -27,6 +27,12 @@
 
 #include "CClientRTDS.hpp"
 
+#define DEFINE_CONCAT_(x, y) x##y
+#define DEFINE_CONCAT(x, y) DEFINE_CONCAT_(x, y)
+
+#define STATIC_ASSERT(expr, message) \
+    enum { DEFINE_CONCAT(FALED_ASSERTION_LINE_, __LINE__) = 1/(!!(expr)) }
+
 //check endianess at compile time.  Middle-Endian not allowed
 #if __BYTE_ORDER == __LITTLE_ENDIAN
 #elif __BYTE_ORDER == __BIG_ENDIAN
@@ -36,16 +42,14 @@
 
 // RTDS uses 4-byte floats and ints
 // The C++ standard does not guarantee a float or an int is 4 bytes
-BOOST_STATIC_ASSERT_MSG(
+STATIC_ASSERT(
     sizeof(int) == 4,
-    "Floating point size error.  RTDS uses 4-byte floats."
-);
+    "Floating point size error.  RTDS uses 4-byte floats." );
 
 // command and state tables only use floats, so this may not be needed
-BOOST_STATIC_ASSERT_MSG(
+STATIC_ASSERT(
     sizeof(float) == 4,
-    "int size error.  RTDS uses 4-byte floats."
-);
+    "int size error.  RTDS uses 4-byte floats." );
 
 #define TIMESTEP 10000  //in microseconds (so it's 10 milliseconds)
 namespace freedm
