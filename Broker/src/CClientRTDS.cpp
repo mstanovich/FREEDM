@@ -84,19 +84,19 @@ bool CClientRTDS::Connect( const std::string p_hostname, const std::string p_por
     boost::asio::ip::tcp::resolver::iterator end;
     // attempt to connect to one of the resolved endpoints
     boost::system::error_code error = boost::asio::error::host_not_found;
-    
+
     while ( error && it != end )
     {
         m_socket.close();
         m_socket.connect( *it, error );
         ++it;
     }
-    
+
     if ( error )
     {
         throw boost::system::system_error(error);
     }
-    
+
     return ( it != end);
 }
 
@@ -121,12 +121,12 @@ void CClientRTDS::Run()
     {
         endian_swap((char *)&tx_buffer[4*i], sizeof(float)); //should be 4 bytes in float.
     }
-    
+
 #endif
     // send to FPGA.
     // Note boost::asio::buffer() function uses buffer size_in_bytes
     boost::asio::write( m_socket, boost::asio::buffer(tx_buffer, tx_bufSize) );
-    
+
     //*******************************
     //* Receive data from FPGA next *
     //*******************************
@@ -134,7 +134,7 @@ void CClientRTDS::Run()
     // FPGA will send values in big-endian byte order
     // If host machine is in little-endian byte order, convert to little-endian
 #if __BYTE_ORDER == __LITTLE_ENDIAN
-    
+
     for (int j=0; j<rx_count; j++)
     {
         endian_swap((char *)&rx_buffer[4*j], sizeof(float));
@@ -183,15 +183,15 @@ CClientRTDS::~CClientRTDS()
 }
 
 void CClientRTDS::endian_swap(char *data, const int num_bytes)
-{   
+{
     char * tmp = new char[num_bytes];
 
     for (int i=0; i<num_bytes; ++i)
         tmp[i] = data[num_bytes - 1 - i];
-        
+
     for (int i=0; i<num_bytes; ++i)
         data[i] = tmp[i];
-    
+
     delete[] tmp;
 }
 
