@@ -77,6 +77,7 @@ add_subdirectory( src )
 add_subdirectory( src/device )
 
 add_executable(PosixBroker src/PosixMain.cpp)
+add_dependencies(broker device)
 
 # link the executable to its dependencies
 target_link_libraries(
